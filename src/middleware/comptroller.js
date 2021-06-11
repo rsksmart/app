@@ -1,4 +1,4 @@
-import ComptrollerAbi from '@/abis/Comptroller.json';
+import ComptrollerAbi from '@/abis/ComptrollerG6.json';
 import { ethers } from 'ethers';
 import Vue from 'vue';
 import { addresses } from './constants';
