@@ -77,5 +77,10 @@ export default [
     name: 'LednToLiquality',
     component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/components/tutorials/LednToLiquality.vue'),
   },
+  {
+    path: '/trade-swaps',
+    name: 'TradeSwaps',
+    component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/views/TradeSwaps.vue'),
+  },
 
 ];

@@ -437,5 +437,13 @@
       "borrow": "Borrow",
       "repayBorrow": "Pay"
     }
+  },
+  "swaps": {
+    "title": "Exchange your cryptos",
+    "description": "Remember that you will be able to make the exchange only with the funds you have in your wallet.",
+    "description1": "Write the amount you are going to exchange",
+    "description2": "You will receive",
+    "description3": "Available: ",
+    "btn1": "Exchange"
   }
 }

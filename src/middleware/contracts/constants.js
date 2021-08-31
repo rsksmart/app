@@ -27,6 +27,7 @@ export const addresses = {
     priceOracleProxy: '0x9422e0a380e9f077767044f43dd16c8d7d3f4b29',
     RIF: '0x19f64674d8a5b4e652319f5e239efd3bc969a1fe',
     DOC: '0xcb46c0ddc60d18efeb0e586c17af6ea36452dae0',
+    USDT: '0x4d5a316d23ebe168d8f887b4447bf8dbfa4901cc',
     rUSDT: '0x4cfe225ce54c6609a525768b13f7d87432358c57',
     RifOracle: '0x4cfe225ce54c6609a525768b13f7d87432358c57',
     RbtcOracle: '0x0c1c2c3fc56e812cb5d6356d38890808ec0336c9',
@@ -51,6 +52,9 @@ export const addresses = {
     kSAT: '0xd1edae988e9afaf6da1b44a4d0c40c0ea03ce9c6',
     tropykusLens: '0x0a9ff3df618aa6c3bd727efe491e5f17faaa82bc',
     whitelist: '0x60e7bbd1c4c6c77d829038137d1a306d5c21aeb1',
+    sovrynSwapNetwork: '0x61172b53423e205a399640e5283e51fe60ec2256',
+    rbtcWrapperProxy: '0x2c468f9c82c20c37cd1606cf3a09702f94910691',
+    wRBTC: '0x69fe5cec81d5ef92600c1a0db1f11986ab3758ab',
   },
 };
 

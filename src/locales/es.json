@@ -440,5 +440,14 @@
       "borrow": "Pedir prestado",
       "repayBorrow": "Pagar"
     }
+  },
+  "swaps": {
+    "title": "Intercambia tus criptos",
+    "description": "Recuerda que podrás hacer el intercambio sólo con los fondos que tienes en tu billetera.",
+    "description1": "Escribe la cantidad que vas a intercambiar",
+    "description2": "Recibirás",
+    "description3": "Disponible: ",
+    "btn1": "Intercambiar"
+
   }
 }

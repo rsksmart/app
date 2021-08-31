@@ -28,6 +28,12 @@ const state = {
     symbol: '',
     img: '',
   },
+  dest_market: null,
+  dest_select: {
+    symbol: '',
+    img: '',
+  },
+  dest_info: initState,
 };
 
 const actions = {
@@ -61,7 +67,7 @@ const actions = {
     const {
       walletAddress, account, page,
     } = data;
-    const { market } = state;
+    const market = (data.isDestSwapMarket) ? state.dest_market : state.market;
 
     info.underlyingSymbol = await market.underlyingAssetSymbol();
     info.rate = page === constants.ROUTE_NAMES.DEPOSITS
@@ -83,8 +89,14 @@ const actions = {
       commit(constants.MARKET_RESET_MARKET);
     }
 
-    commit(constants.MARKET_UPDATE_MARKET, info);
-    commit(constants.MARKET_ISPROGRESS, false);
+    if (data.isDestSwapMarket) {
+      console.log('Hit MARKET_UPDATE_MARKET');
+      commit(constants.MARKET_UPDATE_DEST_MARKET, info);
+      commit(constants.MARKET_ISPROGRESS, false);
+    } else {
+      commit(constants.MARKET_UPDATE_MARKET, info);
+      commit(constants.MARKET_ISPROGRESS, false);
+    }
   },
 
   [constants.MARKET_UPDATE_SELECT]: async ({ commit }, market) => {
@@ -99,7 +111,12 @@ const actions = {
       .get()
       .then((response) => response.data().imageURL);
 
-    commit(constants.MARKET_UPDATE_SELECT, select);
+    if (market.isDestSwapMarket) {
+      console.log('Hit MARKET_UPDATE_SELECT');
+      commit(constants.MARKET_UPDATE_DEST_SELECT, select);
+    } else {
+      commit(constants.MARKET_UPDATE_SELECT, select);
+    }
   },
 
   [constants.MARKET_GET_MARKET]: async ({ commit, dispatch }, data) => {
@@ -110,7 +127,13 @@ const actions = {
     const market = isCRbtc || isCSAT ? new CRbtc(marketAddress, state.chainId)
       : new CToken(marketAddress, state.chainId);
 
-    commit(constants.MARKET_GET_MARKET, market);
+    if (data.isDestSwapMarket) {
+      console.log('Hit MARKET_GET_MARKET');
+      market.isDestSwapMarket = true;
+      commit(constants.MARKET_GET_DEST_MARKET, market);
+    } else {
+      commit(constants.MARKET_GET_MARKET, market);
+    }
 
     dispatch(constants.MARKET_UPDATE_MARKET, { market, ...data });
     dispatch(constants.MARKET_UPDATE_SELECT, market);
@@ -149,6 +172,21 @@ const mutations = {
   // eslint-disable-next-line no-shadow
   [constants.MARKET_RESET_MARKET]: (state) => {
     state.info = initState;
+  },
+
+  // eslint-disable-next-line no-shadow
+  [constants.MARKET_GET_DEST_MARKET]: (state, payload) => {
+    state.dest_market = payload;
+  },
+
+  // eslint-disable-next-line no-shadow
+  [constants.MARKET_UPDATE_DEST_MARKET]: (state, payload) => {
+    state.dest_info = { ...state.dest_info, ...payload };
+  },
+
+  // eslint-disable-next-line no-shadow
+  [constants.MARKET_UPDATE_DEST_SELECT]: (state, payload) => {
+    state.dest_select = { ...state.dest_select, ...payload };
   },
 };
 

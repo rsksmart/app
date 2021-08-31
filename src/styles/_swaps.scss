@@ -1,0 +1,21 @@
+.swapsPanel{
+    max-width: 792px;
+    margin: 40px auto 40px auto;
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+
+
+    .input-box {
+        width: 600px;
+        height: 70px;
+    }
+
+    .btn-action {
+        width: 600px;
+    }
+
+    .swap-dropdown {
+        border-color: black;
+        border-width: 1px;
+    }
+}
