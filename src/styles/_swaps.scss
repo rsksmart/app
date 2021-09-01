@@ -1,21 +1,39 @@
-.swapsPanel{
-    max-width: 792px;
-    margin: 40px auto 40px auto;
-    padding-left: 50px !important;
-    padding-right: 50px !important;
+.swap {
+  .swapsPanel{
+    width: 774px;
+    height: 654px;
+    box-shadow: 0px 10px 30px rgba(52, 52, 52, 0.1) !important;
+    border-radius: 30px !important;
 
-
-    .input-box {
-        width: 600px;
-        height: 70px;
+    .p1-descriptions{
+      font-size: 14px !important;
     }
+    .swapsPanel-content{
+      margin-top: 78px;
+      width: 607px;
+    }
+    .exchange-svg{
+      text-align: center;
+    }
+    .input-box {
+      width: 607px;
+      height: 98px;
+      margin: 0 !important;
+      padding: 11px 28px 23px 16px;
 
+      .h1-title{
+        font-size: 40px;
+      }
+    }
+    
     .btn-action {
-        width: 600px;
+      width: 607px;
     }
 
     .swap-dropdown {
-        border-color: black;
-        border-width: 1px;
+      width: 137px;
+      height: 44px;
+      border: 0.8px solid #4b5c58 !important;
     }
+  }
 }

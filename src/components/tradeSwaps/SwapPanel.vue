@@ -1,33 +1,38 @@
 <template>
-  <v-card width="700" height="415"
-    class="card-item d-flex flex-column justify-space-between swapsPanel">
-    <div class="d-flex justify-space-between">
-      <div class="p1-descriptions mb-3 text-info">
-        {{$t('swaps.description1')}}
+  <v-card color="#E1F0E8" class="swapsPanel d-flex flex-column align-center">
+    <div class="swapsPanel-content">
+      <div class="d-flex justify-space-between">
+        <div class="p1-descriptions mb-2 text-info">
+          {{$t('swaps.description1')}}
+        </div>
+        <div class="p1-descriptions mb-2 text-info">
+          {{$t('swaps.description3')}}
+        </div>
       </div>
-      <div class="p1-descriptions mb-3 text-info">
-        {{$t('swaps.description3')}}
-      </div>
-    </div>
-    <div class="input-box primary-bg ma-0">
+    <div class="input-box primary-bg">
       <div class="d-flex">
-        <v-text-field
-          type="number"
-          v-model="amount"
-          class="h1-title text-info pa-0 ma-0"
-          background-color="#CFE7DA"
-          color="#47B25F"
-          :placeholder="'0 '"
-          filled
-          rounded
-          dense
-          @input="handleAmount"
-        ></v-text-field>
+        <div class="swap">
+          <v-text-field
+            type="number"
+            v-model="amount"
+            class="h1-title text-info pa-0 ma-0"
+            background-color="#CFE7DA"
+            color="#47B25F"
+            :placeholder="'0 '"
+            filled
+            rounded
+            dense
+            @input="handleAmount"
+          ></v-text-field>
+          <div class="p3-USD-values">0 USD</div>
+        </div>
         <dropdown class="swap-dropdown" :select="select" :getMarkets="getMarkets"
         @updateRoute="updateSelect"/>
       </div>
     </div>
-
+    <div class="exchange-svg">
+      <img class="mt-10 mb-5" src="@/assets/icons/exchange.svg" />
+    </div>
     <div class="d-flex justify-space-between">
       <div class="p1-descriptions mb-3 text-info">
         {{$t('swaps.description2')}}
@@ -38,20 +43,33 @@
     </div>
     <div class="input-box primary-bg ma-0">
       <div class="d-flex">
-        <v-text-field
-          type="number"
-          v-model="amountToReceive"
-          class="h1-title text-info pa-0 ma-0"
-          background-color="#CFE7DA"
-          color="#47B25F"
-          :placeholder="'0 '"
-          filled
-          rounded
-          dense
-          disabled
-        ></v-text-field>
-        <dropdown :select="select_I" :getMarkets="getMarkets"
+        <div class="swap">
+          <v-text-field
+            type="number"
+            v-model="amountToReceive"
+            class="h1-title text-info pa-0 ma-0"
+            background-color="#CFE7DA"
+            color="#47B25F"
+            :placeholder="'0 '"
+            filled
+            rounded
+            dense
+            disabled
+          ></v-text-field>
+          <div class="p3-USD-values">0 USD</div>
+        </div>
+        <dropdown class="swap-dropdown" :select="select_I" :getMarkets="getMarkets"
         @updateRoute="updateDestSelect"/>
+      </div>
+    </div>
+    <div class="d-flex mt-12 mb-12">
+      <div class="">
+        <div class="p1-descriptions mb-3">Precio</div>
+        <div class="p1-descriptions">Tasa inversa</div>
+      </div>
+      <div class="ml-9">
+        <div class="p6-reading-values mb-3">1 RBTC = 35.000 USDT</div>
+        <div class="p6-reading-values">1 USDT = 0,00006 RBTC</div>
       </div>
     </div>
     <v-btn text class="btn-action"
@@ -62,6 +80,7 @@
         }}
       </span>
     </v-btn>
+    </div>
   </v-card>
 </template>
 
