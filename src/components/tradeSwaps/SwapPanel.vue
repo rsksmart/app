@@ -3,10 +3,14 @@
     <div class="swapsPanel-content">
       <div class="d-flex justify-space-between">
         <div class="p1-descriptions mb-2 text-info">
-          {{$t('swaps.description1')}}
+            {{$t('swaps.description1')}}
         </div>
         <div class="p1-descriptions mb-2 text-info">
-          {{$t('swaps.description3')}}
+          <span> {{$t('swaps.description3')}} </span>
+          <span class="p6-reading-values">
+            {{sourceTokenBalance}}
+            {{select.underlyingSymbol ? select.underlyingSymbol : ''}}
+          </span>
         </div>
       </div>
     <div class="input-box primary-bg">
@@ -18,14 +22,17 @@
             class="h1-title text-info pa-0 ma-0"
             background-color="#CFE7DA"
             color="#47B25F"
-            :placeholder="'0 '"
+            :placeholder="'0 ' + (select.underlyingSymbol ? select.underlyingSymbol : '')"
             filled
             rounded
             dense
             @input="handleAmount"
           ></v-text-field>
-          <div class="p3-USD-values">0 USD</div>
+          <div class="p3-USD-values"> {{sourceTokenUsdBalance}} USD</div>
         </div>
+        <v-btn  height="40" text @click="setMaxAmount">
+          <span class="text-primary">MÁX</span>
+        </v-btn>
         <dropdown class="swap-dropdown" :select="select" :getMarkets="getMarkets"
         @updateRoute="updateSelect"/>
       </div>
@@ -38,7 +45,11 @@
         {{$t('swaps.description2')}}
       </div>
       <div class="p1-descriptions mb-3 text-info">
-        {{$t('swaps.description3')}}
+        <span> {{$t('swaps.description3')}} </span>
+        <span class="p6-reading-values">
+          {{destTokenBalance}}
+          {{select_I.underlyingSymbol ? select_I.underlyingSymbol : ''}}
+        </span>
       </div>
     </div>
     <div class="input-box primary-bg ma-0">
@@ -50,13 +61,13 @@
             class="h1-title text-info pa-0 ma-0"
             background-color="#CFE7DA"
             color="#47B25F"
-            :placeholder="'0 '"
+            :placeholder="'0 ' + (select_I.underlyingSymbol ? select_I.underlyingSymbol : '')"
             filled
             rounded
             dense
             disabled
           ></v-text-field>
-          <div class="p3-USD-values">0 USD</div>
+          <div class="p3-USD-values"> {{destTokenUsdBalance}} USD</div>
         </div>
         <dropdown class="swap-dropdown" :select="select_I" :getMarkets="getMarkets"
         @updateRoute="updateDestSelect"/>
@@ -64,12 +75,20 @@
     </div>
     <div class="d-flex mt-12 mb-12">
       <div class="">
-        <div class="p1-descriptions mb-3">Precio</div>
-        <div class="p1-descriptions">Tasa inversa</div>
+        <div class="p1-descriptions mb-3">{{$t('swaps.description4')}}</div>
+        <div class="p1-descriptions mb-3">{{$t('swaps.description5')}}</div>
+        <div class="p1-descriptions">{{$t('swaps.description6')}}</div>
       </div>
       <div class="ml-9">
-        <div class="p6-reading-values mb-3">1 RBTC = 35.000 USDT</div>
-        <div class="p6-reading-values">1 USDT = 0,00006 RBTC</div>
+        <div class="p6-reading-values mb-3">
+          1 {{(select.underlyingSymbol ? select.underlyingSymbol : '')}} =
+          {{price}} {{(select_I.underlyingSymbol ? select_I.underlyingSymbol : '')}}
+        </div>
+        <div class="p6-reading-values mb-3">{{ lpFee }} USDT</div>
+        <div class="p6-reading-values">
+          {{ minReturn }}
+          {{(select_I.underlyingSymbol ? select_I.underlyingSymbol : '')}}
+        </div>
       </div>
     </div>
     <v-btn text class="btn-action"
@@ -108,8 +127,18 @@ export default {
       getMarkets: [],
       sourceToken: null,
       destToken: null,
+      selectSourceToken: null,
+      selectDestToken: null,
       conversionPath: null,
       targetAmount: null,
+      minReturn: 0,
+      lpFee: 0,
+      price: null,
+      info: null,
+      sourceTokenBalance: 0,
+      destTokenBalance: 0,
+      sourceTokenUsdBalance: 0,
+      destTokenUsdBalance: 0,
     };
   },
   computed: {
@@ -120,6 +149,7 @@ export default {
       account: (state) => state.Session.account,
       marketsStore: (state) => state.Market.getMarkets,
       infoStore: (state) => state.Market.info,
+      destInfoStore: (state) => state.Market.dest_info,
       selectStore: (state) => state.Market.select,
       destSelectStore: (state) => state.Market.dest_select,
       marketStore: (state) => state.Market.market,
@@ -127,6 +157,10 @@ export default {
     }),
   },
   watch: {
+    walletAddress() {
+      this.updateSelect(this.selectSourceToken);
+      this.updateDestSelect(this.selectDestToken);
+    },
     marketsStore() {
       this.getMarkets = this.marketsStore;
     },
@@ -147,6 +181,25 @@ export default {
     select_I() {
       this.handleAmount();
     },
+    infoStore() {
+      this.info = this.infoStore;
+      if (this.infoStore.underlyingBalance) {
+        this.sourceTokenBalance = this.infoStore.underlyingBalance.toFixed(4);
+      }
+    },
+    destInfoStore() {
+      if (this.destInfoStore.underlyingBalance) {
+        this.destTokenBalance = this.destInfoStore.underlyingBalance.toFixed(4);
+      }
+    },
+    amount() {
+      if (this.info) {
+        this.sourceTokenUsdBalance = this.amount * this.info.price;
+      } else this.sourceTokenUsdBalance = 0;
+    },
+    amountToReceive() {
+      this.destTokenUsdBalance = this.sourceTokenUsdBalance;
+    },
   },
   methods: {
     ...mapActions({
@@ -154,6 +207,7 @@ export default {
       getIsProgressStore: constants.MARKET_ISPROGRESS,
     }),
     updateSelect(marketAddress) {
+      this.selectSourceToken = marketAddress;
       this.$store.dispatch({
         type: constants.MARKET_GET_MARKET,
         marketAddress,
@@ -162,6 +216,7 @@ export default {
       });
     },
     updateDestSelect(marketAddress) {
+      this.selectDestToken = marketAddress;
       this.$store.dispatch({
         type: constants.MARKET_GET_MARKET,
         marketAddress,
@@ -187,12 +242,19 @@ export default {
           destToken);
         const targetAmount = Number(await this.sovrynSwap.getExpextedSwapAmount(conversionPath,
           swapAmount)) / 1e18;
-        this.amountToReceive = targetAmount.toFixed(18);
+        this.amountToReceive = (this.amount) ? targetAmount.toFixed(8) : null;
 
         this.sourceToken = sourceToken;
         this.destToken = destToken;
         this.conversionPath = conversionPath;
         this.targetAmount = targetAmount;
+
+        this.lpFee = (Number(this.targetAmount) * 0.001).toFixed(7);
+        this.minReturn = (Number(this.targetAmount) - (Number(this.targetAmount) * 0.01))
+          .toFixed(7);
+
+        this.price = (Number(await this.sovrynSwap.getExpextedSwapAmount(conversionPath,
+          '1')) / 1e18).toFixed(7);
       }
     },
     async swapTokens() {
@@ -216,12 +278,21 @@ export default {
         }
       }
     },
+    setMaxAmount() {
+      if (!this.account) return;
+      if (this.sourceTokenBalance !== 0) {
+        this.amount = this.sourceTokenBalance;
+        this.handleAmount();
+      }
+    },
   },
   async created() {
     this.sovrynSwap = new SovrynSwap(this.chainId);
     this.swapMarkets = this.markets.filter((market) => market.marketAddress
     !== addresses[this.chainId].kRIF && market.marketAddress !== addresses[this.chainId].kSAT);
     this.getMarketsStore(this.swapMarkets);
+    this.updateSelect(addresses[this.chainId].kDOC);
+    this.updateDestSelect(addresses[this.chainId].kUSDT);
   },
 };
 </script>

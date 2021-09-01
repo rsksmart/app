@@ -44,7 +44,7 @@
         </v-list-item>
 
         <v-list-item class="left-list-item pa-0 ml-1" @click="() => null">
-          <router-link :to="{name: constants.ROUTE_NAMES.SCHOOL}"
+          <router-link :to="{name: constants.ROUTE_NAMES.EXCHANGES}"
             class="d-flex align-center">
             <img class="ml-4 mr-5" src="@/assets/icons/exchanges.svg"/>
             <div class="white--text b2-secondary">{{ $t('menu.sidebar.exchanges') }}</div>

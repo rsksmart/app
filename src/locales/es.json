@@ -446,7 +446,10 @@
     "description": "Recuerda que podrás hacer el intercambio sólo con los fondos que tienes en tu billetera.",
     "description1": "Escribe la cantidad que vas a intercambiar",
     "description2": "Recibirás",
-    "description3": "Disponible: ",
+    "description3": "Disponible:",
+    "description4": "Precio",
+    "description5": "Tarifa de proveedor de liquidez",
+    "description6": "Mínimo recibido",
     "btn1": "Intercambiar"
 
   }

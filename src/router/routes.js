@@ -79,8 +79,7 @@ export default [
   },
   {
     path: '/trade-swaps',
-    name: 'TradeSwaps',
+    name: 'Exchanges',
     component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/views/TradeSwaps.vue'),
   },
-
 ];
