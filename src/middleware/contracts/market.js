@@ -198,9 +198,8 @@ export default class Market {
       if (borrower === address) addressBorrowed += Number(borrowAmount) / factor;
     });
     const repayAmount = await this.getRepays(address);
-    // const borrowBalance = await this.borrowBalanceCurrent(address);
     const initial = addressBorrowed - repayAmount;
-    return initial; // >= 0 ? initial : borrowBalance;
+    return initial;
   }
 
   async getRepays(address) {
@@ -299,17 +298,14 @@ export default class Market {
 
   async repay(account, amountIntended) {
     const accountSigner = signer(account);
-    let value = 0;
-    // : await ethers.utils.parseEther(`${amountIntended}`);
-    if (amountIntended === -1) {
-      value = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
-    } else {
-      value = Market.getAmountDecimals(amountIntended);
-    }
-
+    let value;
     if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
+      value = amountIntended === -1 ? await this.borrowBalanceCurrent(account.address)
+        : Market.getAmountDecimals(amountIntended);
       return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
     }
+    value = amountIntended === -1 ? '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+        : Market.getAmountDecimals(amountIntended);
     const underlyingAsset = new ethers.Contract(
       await this.underlying(),
       StandardTokenAbi,

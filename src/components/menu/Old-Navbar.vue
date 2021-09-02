@@ -38,7 +38,7 @@
             </v-row>
           </v-col>
           <v-col class="pa-2">
-            <template v-if="chainId === 31">
+            <template v-if="chainId === 30">
               <v-btn @click="disconnectAccount" height="45" color="#FFF"
                      outlined width="200">
                 {{ buttonLabel }}
@@ -104,7 +104,7 @@ export default {
       chainId: (state) => state.Session.chainId,
     }),
     buttonLabel() {
-      if (this.chainId === 31 && typeof this
+      if (this.chainId === 30 && typeof this
         .walletAddress === 'string') return this.$t('menu.navbar.disconnect');
       if (typeof this.walletAddress !== 'string') return this.$t('menu.navbar.connect');
       return '';
@@ -118,7 +118,7 @@ export default {
       return '';
     },
     networkColor() {
-      return this.chainId === 31 ? '#074335' : '#E55E3C';
+      return this.chainId === 3 ? '#074335' : '#E55E3C';
     },
     isWalletConnected() {
       return !!this.walletAddress;

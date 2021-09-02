@@ -2,7 +2,7 @@
   <div class="d-flex justify-end navbar-vue">
     <template v-if="isWalletConnected">
       <v-card flat class="secondary-color rounded-card"
-              v-bind:class="[chainId === 31 ? 'secondary-color' : 'warning-color']">
+              v-bind:class="[chainId === 30 ? 'secondary-color' : 'warning-color']">
         <v-row class="ma-2">
           <v-col cols="auto" class="pa-0 d-flex justify-center align-center">
             <v-img alt="market icon" :src="avatarImage" :height="35" :width="35" contain/>
@@ -15,12 +15,12 @@
             </v-row>
             <v-row class="ma-0">
               <div class="b2-secondary text-detail">
-                {{ chainId === 31 ? network : $t('menu.navbar.network') }}
+                {{ chainId === 30 ? network : $t('menu.navbar.network') }}
               </div>
             </v-row>
           </v-col>
           <v-col class="pa-0">
-            <template v-if="chainId === 31">
+            <template v-if="chainId === 30">
               <v-btn text class="btn btn-info" @click="disconnectAccount">
                 <span class="b1-main text-detail">
                   {{ buttonLabel }}
@@ -95,13 +95,13 @@ export default {
       chainId: (state) => state.Session.chainId,
     }),
     avatarSize() {
-      return this.chainId === 31 ? 35 : 20;
+      return this.chainId === 30 ? 35 : 20;
     },
     avatarImage() {
-      return this.chainId === 31 ? Avatar : Error;
+      return this.chainId === 30 ? Avatar : Error;
     },
     buttonLabel() {
-      if (this.chainId === 31 && typeof this
+      if (this.chainId === 30 && typeof this
         .walletAddress === 'string') return this.$t('menu.navbar.disconnect');
       if (typeof this.walletAddress !== 'string') return this.$t('menu.navbar.connect');
       return '';
@@ -115,7 +115,7 @@ export default {
       return '';
     },
     networkColor() {
-      return this.chainId === 31 ? 'transparent' : '#FCDE73';
+      return this.chainId === 30 ? 'transparent' : '#FCDE73';
     },
     isWalletConnected() {
       return !!this.walletAddress;

@@ -8,7 +8,7 @@ const state = {
   walletAddress: undefined,
   account: undefined,
   wallet: undefined,
-  chainId: 31,
+  chainId: 30,
   provider: undefined,
   markets: [],
   drawer: true,
@@ -40,22 +40,22 @@ const actions = {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: '0x1f',
-              chainName: 'RSK Testnet',
+              chainId: '0x1e',
+              chainName: 'RSK Mainnet',
               nativeCurrency: {
-                name: 'Test RBTC',
-                symbol: 'tRBTC',
+                name: 'RBTC',
+                symbol: 'RBTC',
                 decimals: 18,
               },
-              rpcUrls: ['https://public-node.testnet.rsk.co'],
-              blockExplorerUrls: ['https://explorer.testnet.rsk.co'],
+              rpcUrls: ['https://public-node.rsk.co'],
+              blockExplorerUrls: ['https://explorer.rsk.co'],
             },
           ],
         });
         await window.ethereum.request({ method: 'eth_requestAccounts' });
       } else if (wallet === constants.WALLET_CONNECT) {
         provider = new WalletConnectProvider({
-          rpc: { 31: process.env.VUE_APP_RSK_NODE },
+          rpc: { 30: process.env.VUE_APP_RSK_NODE },
         });
         await provider.enable();
         const { connector: { _peerMeta: { name } } } = provider;
@@ -89,7 +89,7 @@ const actions = {
       return;
     }
     if (window.ethereum) {
-      const chainId = window?.ethereum?.chainId ?? 31;
+      const chainId = window?.ethereum?.chainId ?? 30;
       if (window.ethereum.isLiquality) {
         commit(constants.SESSION_SET_PROPERTY, { chainId: parseInt(chainId, 16) });
         return;
@@ -113,7 +113,7 @@ const actions = {
     commit(constants.SESSION_SET_PROPERTY, { wallet: undefined });
     commit(constants.SESSION_SET_PROPERTY, { provider: undefined });
     // commit(constants.SESSION_SET_PROPERTY, { markets: [] });
-    commit(constants.SESSION_SET_PROPERTY, { chainId: 31 });
+    commit(constants.SESSION_SET_PROPERTY, { chainId: 30 });
     const web3 = new ethers.providers.JsonRpcProvider(process.env.VUE_APP_RSK_NODE);
     const format = web3.formatter.formats;
     format.receipt.root = format.receipt.logsBloom;
