@@ -28,7 +28,6 @@
             dense
             @input="handleAmount"
           ></v-text-field>
-          <div class="p3-USD-values"> {{sourceTokenUsdBalance}} USD</div>
         </div>
         <v-btn  height="40" text @click="setMaxAmount">
           <span class="text-primary">MÁX</span>
@@ -38,7 +37,7 @@
       </div>
     </div>
     <div class="exchange-svg">
-      <img class="mt-10 mb-5" src="@/assets/icons/exchange.svg" />
+      <img class="mt-10 mb-5" src="@/assets/icons/exchange.svg"  @click="swapSelectedTokens"/>
     </div>
     <div class="d-flex justify-space-between">
       <div class="p1-descriptions mb-3 text-info">
@@ -65,9 +64,7 @@
             filled
             rounded
             dense
-            disabled
           ></v-text-field>
-          <div class="p3-USD-values"> {{destTokenUsdBalance}} USD</div>
         </div>
         <dropdown class="swap-dropdown" :select="select_I" :getMarkets="getMarkets"
         @updateRoute="updateDestSelect"/>
@@ -76,7 +73,6 @@
     <div class="d-flex mt-12 mb-12">
       <div class="">
         <div class="p1-descriptions mb-3">{{$t('swaps.description4')}}</div>
-        <div class="p1-descriptions mb-3">{{$t('swaps.description5')}}</div>
         <div class="p1-descriptions">{{$t('swaps.description6')}}</div>
       </div>
       <div class="ml-9">
@@ -84,7 +80,6 @@
           1 {{(select.underlyingSymbol ? select.underlyingSymbol : '')}} =
           {{price}} {{(select_I.underlyingSymbol ? select_I.underlyingSymbol : '')}}
         </div>
-        <div class="p6-reading-values mb-3">{{ lpFee }} USDT</div>
         <div class="p6-reading-values">
           {{ minReturn }}
           {{(select_I.underlyingSymbol ? select_I.underlyingSymbol : '')}}
@@ -132,13 +127,10 @@ export default {
       conversionPath: null,
       targetAmount: null,
       minReturn: 0,
-      lpFee: 0,
-      price: null,
+      price: 0,
       info: null,
       sourceTokenBalance: 0,
       destTokenBalance: 0,
-      sourceTokenUsdBalance: 0,
-      destTokenUsdBalance: 0,
     };
   },
   computed: {
@@ -192,13 +184,8 @@ export default {
         this.destTokenBalance = this.destInfoStore.underlyingBalance.toFixed(4);
       }
     },
-    amount() {
-      if (this.info) {
-        this.sourceTokenUsdBalance = this.amount * this.info.price;
-      } else this.sourceTokenUsdBalance = 0;
-    },
-    amountToReceive() {
-      this.destTokenUsdBalance = this.sourceTokenUsdBalance;
+    price() {
+      if (this.price.isNan()) this.price = 0;
     },
   },
   methods: {
@@ -206,18 +193,18 @@ export default {
       getMarketsStore: constants.MARKET_GET_MARKETSINFO,
       getIsProgressStore: constants.MARKET_ISPROGRESS,
     }),
-    updateSelect(marketAddress) {
+    async updateSelect(marketAddress) {
       this.selectSourceToken = marketAddress;
-      this.$store.dispatch({
+      await this.$store.dispatch({
         type: constants.MARKET_GET_MARKET,
         marketAddress,
         walletAddress: this.walletAddress,
         account: this.account,
       });
     },
-    updateDestSelect(marketAddress) {
+    async updateDestSelect(marketAddress) {
       this.selectDestToken = marketAddress;
-      this.$store.dispatch({
+      await this.$store.dispatch({
         type: constants.MARKET_GET_MARKET,
         marketAddress,
         walletAddress: this.walletAddress,
@@ -249,13 +236,11 @@ export default {
         this.conversionPath = conversionPath;
         this.targetAmount = targetAmount;
 
-        this.lpFee = (Number(this.targetAmount) * 0.001).toFixed(7);
         this.minReturn = (Number(this.targetAmount) - (Number(this.targetAmount) * 0.01))
           .toFixed(7);
-
-        this.price = (Number(await this.sovrynSwap.getExpextedSwapAmount(conversionPath,
-          '1')) / 1e18).toFixed(7);
       }
+
+      this.price = (!this.amount) ? 0 : (this.amountToReceive / this.amount);
     },
     async swapTokens() {
       if (this.sourceToken && this.destToken) {
@@ -284,6 +269,22 @@ export default {
         this.amount = this.sourceTokenBalance;
         this.handleAmount();
       }
+    },
+    swapSelectedTokens() {
+      let aux = this.select;
+      this.select = this.select_I;
+      this.select_I = aux;
+
+      aux = this.selectSourceToken;
+      this.selectSourceToken = this.selectDestToken;
+      this.selectDestToken = aux;
+
+      this.updateSelect(this.selectSourceToken);
+      this.updateDestSelect(this.selectDestToken);
+
+      aux = this.amount;
+      this.amount = this.amountToReceive;
+      this.amountToReceive = aux;
     },
   },
   async created() {
