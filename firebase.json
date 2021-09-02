@@ -5,7 +5,7 @@
   },
   "hosting": [
     {
-      "target": "palm2",
+      "target": "palm-main",
       "public": "dist",
       "ignore": [
         "firebase.json",
