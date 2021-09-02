@@ -20,7 +20,7 @@ const initState = {
 
 const state = {
   getMarkets: [],
-  chainId: 31,
+  chainId: 30,
   market: null,
   isProgress: true,
   info: initState,

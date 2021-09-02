@@ -300,12 +300,14 @@ export default class Market {
     const accountSigner = signer(account);
     let value;
     if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
-      value = amountIntended === -1 ? await this.borrowBalanceCurrent(account.address)
+      const borrowBalanceCurrent = await this.borrowBalanceCurrent(account.address);
+      console.log('borrowBalanceCurrent:', borrowBalanceCurrent);
+      value = amountIntended === -1 ? borrowBalanceCurrent
         : Market.getAmountDecimals(amountIntended);
       return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
     }
     value = amountIntended === -1 ? '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-        : Market.getAmountDecimals(amountIntended);
+      : Market.getAmountDecimals(amountIntended);
     const underlyingAsset = new ethers.Contract(
       await this.underlying(),
       StandardTokenAbi,
