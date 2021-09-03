@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="exchange-svg">
-      <img class="mt-10 mb-5" src="@/assets/icons/exchange.svg"  @click="swapSelectedTokens"/>
+      <img class="mt-7 mb-2" src="@/assets/icons/exchange.svg"  @click="swapSelectedTokens"/>
     </div>
     <div class="d-flex justify-space-between">
       <div class="p1-descriptions mb-3 text-info">
@@ -70,10 +70,38 @@
         @updateRoute="updateDestSelect"/>
       </div>
     </div>
-    <div class="d-flex mt-12 mb-12">
+    <div class="d-flex mt-12 mb-8">
       <div class="">
-        <div class="p1-descriptions mb-3">{{$t('swaps.description4')}}</div>
-        <div class="p1-descriptions">{{$t('swaps.description6')}}</div>
+        <div class="d-flex p1-descriptions mb-3">
+          <div>
+            {{$t('swaps.description4')}}
+          </div>
+          <v-tooltip top
+            content-class="secondary-color box-shadow-tooltip" max-width="180">
+            <template v-slot:activator="{ on, attrs }">
+              <v-img v-bind="attrs" v-on="on" width="15" height="15"
+                      src="@/assets/icons/info2.svg" contain/>
+            </template>
+            <span class="p5-feedback text-info">
+              {{ $t('swaps.tooltip1') }}
+            </span>
+          </v-tooltip>
+        </div>
+        <div class="d-flex p1-descriptions">
+          <div class="mr-1">
+            {{$t('swaps.description6')}}
+          </div>
+          <v-tooltip top
+            content-class="secondary-color box-shadow-tooltip" max-width="180">
+            <template v-slot:activator="{ on, attrs }">
+              <v-img v-bind="attrs" v-on="on" width="15" height="15"
+                      src="@/assets/icons/info2.svg" contain/>
+            </template>
+            <span class="p5-feedback text-info">
+              {{ $t('swaps.tooltip2') }}
+            </span>
+          </v-tooltip>
+        </div>
       </div>
       <div class="ml-9">
         <div class="p6-reading-values mb-3">
@@ -86,14 +114,25 @@
         </div>
       </div>
     </div>
-    <v-btn text class="btn-action"
+    <!-- <v-btn text class="btn-action"
             :class="'secondary-bg'" @click="swapTokens">
       <span class="white--text">
         {{
           $t('swaps.btn1')
         }}
       </span>
-    </v-btn>
+    </v-btn> -->
+    <v-btn text class="btn-action"
+        :disabled="!activeButton"
+        :class="activeButton ? 'primary-color' : 'secondary-bg'"
+        @click="swapTokens"
+      >
+        <span class="white--text">
+          {{
+            account ? $t('swaps.btn1') : $t('swaps.btn2')
+          }}
+        </span>
+      </v-btn>
     </div>
   </v-card>
 </template>
@@ -186,6 +225,15 @@ export default {
     },
     price() {
       if (this.price.isNan()) this.price = 0;
+    },
+    activeButton() {
+      return this.amount > 0;
+      // && typeof this
+      // .rules.liquidity() !== 'string' && typeof this
+      // .rules.minBalance() !== 'string' && typeof this
+      // .rules.payBorrow() !== 'string' && typeof this
+      // .rules.borrowBalance() !== 'string' && typeof this
+      // .rules.cash() !== 'string';
     },
   },
   methods: {

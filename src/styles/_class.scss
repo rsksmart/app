@@ -120,27 +120,28 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
   }
 
   &.swap-dropdown{
-    width: 137px !important;
-    height: 44px !important;
+    width: 89px !important;
+    height: 28px !important;
     padding-bottom: 10px;
-    margin-top: 14px;
+    // margin-top: 14px;
     .selected-item{
-      width: 137px !important;
+      width: 89px !important;
+      height: 28px !important;
       img{
-        width: 18px;
-        height: 18px;
-        margin: 0 9px 5px 15px !important;
+        width: 11px;
+        height: 11px;
+        margin: 0 9px 5px 13px !important;
       }
       .select-icon{
-        right: 12px !important;
-        top: 17px !important;
+        right: 9px !important;
+        top: 12px !important;
         width: 17px !important;
         height: 5px !important;
-        color: #042F24 !important;
-        font-size: 27px !important;
+        color: #47B25F !important;
+        font-size: 20px !important;
       }
       .h3-sections-heading{
-        font-size: 14px !important;
+        font-size: 11px !important;
         margin-bottom: 5px;
       }
     }

@@ -291,7 +291,7 @@
     "description3": "Current dynamic annual interest rate",
     "description4": "Write the amount you are going to borrow",
     "description5": "By default, all your deposits are used as collateral to make a loan in any market.",
-    "description6": "Settlement risk",
+    "description6": "Liquidation risk",
     "btn1": "Connect wallet",
     "btn2": "Borrow",
     "tooltip1": "This value is your maximum debt capacity for your collateral",
@@ -447,6 +447,9 @@
     "description4": "Price",
     "description5": "Liquidity provider fee",
     "description6": "Minimum received",
-    "btn1": "Exchange"
+    "btn1": "Exchange",
+    "btn2": "Connect wallet",
+    "tooltip1": "This is the equivalent value between the two selected currencies",
+    "tooltip2": "The value you will receive for the exchange can be up to 1% less than the initial amount of the transaction. Keep in mind that to benefit you, if the minimum exceeds the 1% limit, the transaction will be canceled."
   }
 }

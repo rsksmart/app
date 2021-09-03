@@ -450,7 +450,9 @@
     "description4": "Precio",
     "description5": "Tarifa de proveedor de liquidez",
     "description6": "Mínimo recibido",
-    "btn1": "Intercambiar"
-
+    "btn1": "Intercambiar",
+    "btn2": "Conectar billetera",
+    "tooltip1": "Este es el valor equivalente entre las dos monedas seleccionadas",
+    "tooltip2": "El valor que recibirás por el intercambio puede ser hasta 1% menor del monto inicial de la transacción. Ten en cuenta que para beneficiarte, si el minimo supera el límite del 1%, la transacción se cancelará. "
   }
 }

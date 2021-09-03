@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column align-center swap">
-    <h2 class="h2-heading mb-7 text-primary">
+    <h2 class="h2-heading mb-7 text-primary mt-7">
       {{ $t('swaps.title') }}
     </h2>
     <p class="p1-descriptions text-info text-description">
