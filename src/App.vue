@@ -12,11 +12,13 @@
     <template v-if="isPioneer">
       <pioneer :showModal="isPioneer" :authorized="authorized" @closed="closeDialog" />
     </template>
+    <feedback-bubble />
   </v-app>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex';
+import FeedbackBubble from '@/components/menu/FeedbackBubble.vue';
 import Navbar from '@/components/menu/Navbar.vue';
 import LeftBar from '@/components/menu/LeftBar.vue';
 import Pioneer from '@/components/dialog/Pioneer.vue';
@@ -33,6 +35,7 @@ import * as constants from '@/store/constants';
 export default {
   name: 'App',
   components: {
+    FeedbackBubble,
     Navbar,
     LeftBar,
     Pioneer,

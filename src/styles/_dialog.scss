@@ -81,6 +81,21 @@
     height: 150px !important;
     font-size: 100px;
   }
+  .feedback {
+    .feedback-title {
+      color: $text-detail;
+      font-size: 15px;
+      line-height: 17px;
+      letter-spacing: 0.3px;
+      font-weight: 400;
+    }
+    .feedback-paragraph {
+      color: $third-color;
+      font-size: 11px;
+      line-height: 12px;
+      font-weight: 300;
+    }
+  }
 }
 .d-tutorial{
   max-width: 700px !important;
@@ -217,6 +232,62 @@
     .b2-secondary{
       font-size: 11px;
     }
+  }
+}
+
+.feedback-dialog {
+  .content-card {
+    background-color: $btn-wallet;
+  }
+  .primary-title {
+    color: $text-detail;
+    font-size: 20px;
+    line-height: 22px;
+    font-weight: 400;
+  }
+  .secondary-title {
+    color: $text-detail;
+    font-size: 18px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+  .primary-paragraph {
+    color: $third-color;
+    font-size: 11px;
+    line-height: 12px;
+    font-weight: 300;
+  }
+  .secondary-paragraph {
+    color: $third-color;
+    font-size: 9px;
+    line-height: 11px;
+    font-weight: 300;
+  }
+  .choose-option-button {
+    cursor: pointer;
+    border-radius: 10px;
+    color: $text-value;
+    font-size: 11px;
+    line-height: 13px;
+    font-weight: 400;
+    padding: 14px 80px;
+  }
+  .custom-textarea {
+    border-radius: 10px;
+    width: 100%;
+    background-color: $primary-bg;
+    color: $text-bg;
+    outline: none;
+    resize: none;
+    font-size: 11px;
+    line-height: 12px;
+    padding: 11px 19px 6px 19px;
+  }
+  .email-textarea {
+    height: 35px;
+  }
+  .problem-textarea {
+    min-height: 92px;
   }
 }
 

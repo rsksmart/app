@@ -220,6 +220,16 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
     height: 30px;
   }
 }
+//metrics select box
+.v-menu__content{
+  .metrics-select-menu-item {
+    width: auto;
+    height: 62px;
+  }
+  .active{
+    background-color: #CDE9DA;
+  }
+}
 
 .theme--light.v-list {
   color: rgba(0, 0, 0, 0.87);
@@ -243,6 +253,8 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
   width: 237px;
   height: 43px !important;
   border-radius: 20px;
+  text-decoration: none;
+  text-align: center;
 }
 .btn-action{
   width: 590px;
@@ -318,6 +330,12 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
 }
 .text-bg{
   color: $text-bg !important;
+}
+
+.buttons-group {
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 300;
 }
 
 //=======================

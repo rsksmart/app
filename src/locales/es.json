@@ -99,6 +99,14 @@
       "description6": "Has pagado",
       "btn": "Continuar"
     },
+    "firstTransaction": {
+      "title": "Autoriza las 3 transacciones",
+      "transactions": [
+        "Autoriza el monto de la transacción",
+        "Autoriza la transacción",
+        "Autorizar tus depósitos como colateral"
+      ]
+    },
     "error": {
       "description1": "No se pudo completar el depósito. Intenta más tarde",
       "description2": "No se pudo completar el retiro. Intenta más tarde.",
@@ -266,7 +274,7 @@
       "school": "Escuela Tropykus",
       "markets": "Mercados",
       "protocol": "Sobre Tropykus",
-      "language": "Español",
+      "language": "English",
       "github": "Repository"
     },
     "navbar": {
@@ -278,11 +286,55 @@
     }
   },
   "internal-metrics": {
-    "title": "Reservas",
-    "number-addresses": "Numero de direcciones unicas",
+    "title": "Métricas de usuario",
+    "number-addresses": "Número de direcciones unicas",
+    "number-new-addresses": "Número de usuarios ganados",
+    "number-retire-addresses": "Número de usuarios retirados",
+    "number-active-addresses": "Usuarios activos hoy",
     "total-subsidy": "Total fondo de subsidio",
     "market": "Mercado",
-    "total-reserves": "Total Reservas"
+    "total-reserves": "Total Reservas",
+    "dropdown": [
+      {
+        "title": "Número total de usuarios activos",
+        "collection": "active-users",
+        "index": 0
+      },
+      {
+        "title": "Valor total almacenado",
+        "collection": "value-locked",
+        "index": 1
+      },
+      {
+        "title": "Número total de depósitos",
+        "collection": "total-deposits",
+        "index": 2
+      },
+      {
+        "title": "Número total de deudas",
+        "collection": "total-borrows",
+        "index": 3
+      },
+      {
+        "title": "Número de nuevos usuarios",
+        "collection": "new-users",
+        "index": 4
+      }
+    ],
+    "months": {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    }
   },
   "borrows": {
     "title": "Pide prestado y multiplica tus ganancias",
@@ -317,7 +369,7 @@
   },
   "deposits": {
     "title": "Deposita tus RBTC y gana el 4% anual",
-    "description": "Saca rendimiento de tus bitcoins convirtiendolos en RBTC o compra RBTC",
+    "description": "Obtén ganancias de tus Bitcoin convirtiendolos en RBTC.",
     "subtitle": "Deposita tus criptos y obten ganancias",
     "btn1": "Convertir BTC a RBTC",
     "btn2": "Comprar RBTC"

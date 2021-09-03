@@ -55,7 +55,7 @@ export default {
       counter: 0,
       priceRbtc: 0,
       isLoading: true,
-      riskValue: 100,
+      riskValue: 0,
       comptroller: null,
       marketAddresses: [],
       myMarkets: [],
@@ -168,8 +168,13 @@ export default {
         this.liquidity = await this.comptroller.getAccountLiquidity(this.walletAddress);
 
         // risk value
-        this.riskValue = await this.comptroller
-          .healthFactor(this.markets, this.chainId, this.walletAddress) * 100;
+        // this.riskValue = await this.comptroller
+        //   .healthFactor(this.markets, this.chainId, this.walletAddress) * 100;
+        // new risk
+        const risk = await this.comptroller
+          .risk(this.markets, this.walletAddress, this.chainId);
+        console.log('risk', risk);
+        this.riskValue = Number(risk.result);
 
         // Supply
         this.infoDeposits = await this.comptroller
@@ -206,12 +211,14 @@ export default {
 
           // Supply
           info.supplyBalance = await market.currentBalanceOfCTokenInUnderlying(this.walletAddress);
+          info.supplyBalance = (info.supplyBalance * info.price) <= 1e-5 ? 0 : info.supplyBalance;
           info.interestBalance = await market.getEarnings(this.walletAddress);
           info.blanceUsd = info.supplyBalance * info.price;
           info.interesUsd = info.interestBalance * info.price;
 
           // Borrow
           info.borrowBalance = await market.borrowBalanceCurrent(this.walletAddress);
+          info.borrowBalance = (info.borrowBalance * info.price) <= 1e-5 ? 0 : info.borrowBalance;
           info.interestBorrow = await market.getDebtInterest(this.walletAddress);
           info.borrowUsd = info.borrowBalance * info.price;
           info.interestBorrowUsd = info.interestBorrow * info.price;

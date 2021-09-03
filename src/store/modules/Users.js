@@ -17,6 +17,7 @@ const state = {
     loading: true,
     deposit: true,
     success: null,
+    firstTx: false,
   },
 };
 const actions = {
@@ -64,13 +65,28 @@ const actions = {
     info.loading = true;
     info.symbol = symbol;
     info.wallet = true;
-
     commit(constants.USER_ACTION_INFO_DIALOG, info);
 
     const assetsIn = await comptroller.getAssetsIn(Session.walletAddress);
     const allMarkets = await comptroller.allMarkets();
     if (assetsIn.indexOf(market.marketAddress) === -1) {
-      await comptroller.enterMarkets(Session.account, allMarkets);
+      info.firstTx = true;
+      commit(constants.USER_ACTION_INFO_DIALOG, info);
+      await comptroller.enterMarkets(Session.account, allMarkets)
+        .then((tx) => firestore.saveUserAction(
+          comptroller.comptrollerAddress,
+          Session.walletAddress,
+          'MarketEntered',
+          0,
+          null,
+          null,
+          null,
+          new Date(),
+          tx.hash,
+        ))
+        .catch();
+      info.firstTx = false;
+      commit(constants.USER_ACTION_INFO_DIALOG, info);
     }
 
     await market.supply(Session.account, amount)
@@ -282,7 +298,8 @@ const actions = {
     commit(constants.USER_ACTION_INFO_DIALOG, info);
     let amountPay = amount;
     if (Number(amount) === Market.info.borrowBalance) amountPay = -1;
-    await market.repay(Session.account, amountPay)
+    console.log('amountPay', amountPay);
+    await market.repay(Session.account, amountPay, Session.walletAddress)
       .then((tx) => {
         // console.log(tx);
         info.wallet = false;
@@ -345,6 +362,27 @@ const actions = {
     }
   },
 
+  [constants.USER_FEEDBACK]: async ({ dispatch, commit }, data) => {
+    const info = {
+      type: 'feedback',
+      loading: true,
+    };
+    commit(constants.USER_ACTION_INFO_DIALOG, info);
+    dispatch(constants.USER_ACTION_DIALOG, true);
+
+    const firebase = (new Firestore()).db;
+    firebase.collection('feedback')
+      .add(data)
+      .then(() => {
+        info.loading = false;
+        info.success = true;
+        commit(constants.USER_ACTION_INFO_DIALOG, info);
+      }).catch(() => {
+        info.loading = false;
+        info.success = false;
+        commit(constants.USER_ACTION_INFO_DIALOG, info);
+      });
+  },
 };
 
 const mutations = {

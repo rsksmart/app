@@ -132,7 +132,7 @@ export default class Market {
 
   async currentBalanceOfCTokenInUnderlying(address) {
     const cTokenBalance = await this.balanceOf(address);
-    const exchangeRate = await this.exchangeRateStored();
+    const exchangeRate = await this.exchangeRateCurrent();
     return (cTokenBalance * exchangeRate);
   }
 
@@ -157,6 +157,10 @@ export default class Market {
     return Number(await this.instance.callStatic.exchangeRateStored()) / factor;
   }
 
+  async getTotalSupply() {
+    return Number(await this.instance.callStatic.totalSupply()) / factor;
+  }
+
   async getReserves() {
     return Number(await this.instance.callStatic.totalReserves()) / factor;
   }
@@ -165,51 +169,6 @@ export default class Market {
     return isRbtc
       ? Number(this.instance.callStatic.subsidyFund
         ? await this.instance.callStatic.subsidyFund() : 0) / factor : 0;
-  }
-
-  async getInitialSupply(address) {
-    const supplyEvents = await this.instance.queryFilter('Mint', -500000);
-    let addressSupplied = 0;
-    supplyEvents.forEach((supply) => {
-      const [minter, mintAmount] = supply.args;
-      if (minter === address) addressSupplied += Number(mintAmount) / factor;
-    });
-    const redeemAmount = await this.getRedeems(address);
-    // const supplyBalance = await this.currentBalanceOfCTokenInUnderlying(address);
-    const initial = addressSupplied - redeemAmount;
-    return initial; // >= 0 ? initial : supplyBalance;
-  }
-
-  async getRedeems(address) {
-    const redeemEvents = await this.instance.queryFilter('Redeem', -500000);
-    let addressRedeem = 0;
-    redeemEvents.forEach((redeem) => {
-      const [redeemer, redeemAmount] = redeem.args;
-      if (redeemer === address) addressRedeem += Number(redeemAmount) / factor;
-    });
-    return addressRedeem;
-  }
-
-  async getInitialBorrow(address) {
-    const borrowEvents = await this.instance.queryFilter('Borrow', -500000);
-    let addressBorrowed = 0;
-    borrowEvents.forEach((borrow) => {
-      const [borrower, borrowAmount] = borrow.args;
-      if (borrower === address) addressBorrowed += Number(borrowAmount) / factor;
-    });
-    const repayAmount = await this.getRepays(address);
-    const initial = addressBorrowed - repayAmount;
-    return initial;
-  }
-
-  async getRepays(address) {
-    const supplyEvents = await this.instance.queryFilter('RepayBorrow', -500000);
-    let addressRepayed = 0;
-    supplyEvents.forEach((repay) => {
-      const [borrower, repayAmount] = repay.args;
-      if (borrower === address) addressRepayed += Number(repayAmount) / factor;
-    });
-    return addressRepayed;
   }
 
   async getDebtInterest(address) {
@@ -296,13 +255,12 @@ export default class Market {
     return this.instance.connect(accountSigner).redeem(amount, { gasLimit: this.gasLimit });
   }
 
-  async repay(account, amountIntended) {
+  async repay(account, amountIntended, walletAddress) {
     const accountSigner = signer(account);
-    let value;
+    let value = 0;
     if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
-      const borrowBalanceCurrent = await this.borrowBalanceCurrent(account.address);
-      console.log('borrowBalanceCurrent:', borrowBalanceCurrent);
-      value = amountIntended === -1 ? borrowBalanceCurrent
+      const borrowBalanceCurrent = await this.borrowBalanceCurrent(walletAddress);
+      value = amountIntended === -1 ? Market.getAmountDecimals(borrowBalanceCurrent)
         : Market.getAmountDecimals(amountIntended);
       return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
     }

@@ -1,5 +1,6 @@
 export const addresses = {
   30: {
+    deployBlock: 2000000,
     multiSigWallet: '0x8c77dfa67dbfbdeacf84adef5a383b1330726896',
     priceOracleProxy: '0x72177b8ac1580f755432bda69c312eefbb90f6e2',
     RIF: '0x2acc95758f8b5f583470ba265eb685a8f45fc9d5',

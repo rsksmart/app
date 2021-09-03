@@ -457,9 +457,10 @@ export default {
       this.showModalConnectWallet = false;
     },
     setAmount() {
-      this.amount = (this.sliderAmountPercentage * this.tokenBalance) / 100;
-      if (this.account) {
-        this.amount = this.amount.toFixed(10);
+      if (this.sliderAmountPercentage === 100) {
+        this.amount = this.tabMenu ? this.info.underlyingBalance : this.info.supplyBalance;
+      } else {
+        this.amount = (this.sliderAmountPercentage * this.tokenBalance) / 100;
       }
     },
     setMaxAmount() {

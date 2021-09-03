@@ -9,22 +9,11 @@
       </p>
     </div>
     <div class="d-flex justify-center actions-bottons">
-      <v-btn
-        class="btn mr-9"
-        text
-      >
+      <a target="_blank" class="btn btn-secondary" :href="url">
         <span class="b1-main text-primary">
           {{ $t('deposits.btn1') }}
         </span>
-      </v-btn>
-      <v-btn
-        class="btn btn-secondary"
-        text
-      >
-        <span class="b1-main text-primary">
-          {{ $t('deposits.btn2') }}
-        </span>
-      </v-btn>
+      </a>
     </div>
 
     <v-row class="ma-0">
@@ -33,12 +22,11 @@
       </p>
     </v-row>
 
-    <landing :inBorrowMenu="inBorrowMenu" :key="key"/>
-
+    <landing />
   </div>
 </template>
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import Landing from '@/components/home/Landing.vue';
 import * as constants from '@/store/constants';
 
@@ -48,30 +36,36 @@ export default {
   },
   data() {
     return {
-      inBorrowMenu: false,
-      key: 0,
+      constants,
+      url: 'https://www.youtube.com/watch?v=a973Xe2e6tQ',
     };
   },
+  watch: {
+    wallet() {
+      this.tutorial();
+    },
+  },
   computed: {
-    ...mapGetters({
-      isLoggedIn: constants.SESSION_IS_CONNECTED,
-    }),
     ...mapState({
-      routePath: (state) => state.route.path,
+      wallet: (state) => state.Session.wallet,
     }),
   },
+  methods: {
+    tutorial() {
+      if (this.wallet === constants.WALLET_LIQUALITY) {
+        this.url = 'https://www.youtube.com/watch?v=a973Xe2e6tQ';
+      }
+      if (this.wallet === constants.WALLET_METAMASK
+        || this.wallet === constants.WALLET_NIFTY) {
+        this.url = 'https://www.youtube.com/watch?v=K0OL16M7a-I';
+      }
+      if (this.wallet === constants.WALLET_DEFIANT) {
+        this.url = 'https://www.youtube.com/watch?v=RwYjEjLH4E8';
+      }
+    },
+  },
   created() {
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', () => {
-        this.key += 1;
-      });
-      window.ethereum.on('chainChanged', () => {
-        this.key += 1;
-      });
-    }
-    if (this.routePath === '/es') {
-      this.$i18n.locale = 'es';
-    }
+    this.tutorial();
   },
 };
 </script>
