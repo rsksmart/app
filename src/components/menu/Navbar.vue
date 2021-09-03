@@ -66,20 +66,18 @@
         {{ buttonLabel }}
       </v-btn>
     </template>
-    <template v-if="showModalConnectWallet">
-      <connect-wallet
-        :showModal="showModalConnectWallet"
-        @closed="outsideConnectWallet"
-      />
-    </template>
   </v-app-bar>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex';
-import ConnectWallet from '@/components/dialog/ConnectWallet.vue';
+
 import { Market, CRbtc, CToken } from '@/middleware';
 import * as constants from '@/store/constants';
+import RLogin from '@rsksmart/rlogin';
+
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import Portis from '@portis/web3';
 
 export default {
   name: 'Navbar',
@@ -88,6 +86,31 @@ export default {
       db: this.$firebase.firestore(),
       showModalConnectWallet: false,
       markets: [],
+      rLogin: new RLogin({
+        cacheProvider: false,
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              rpc: {
+                30: 'https://public-node.rsk.co',
+                31: 'https://public-node.testnet.rsk.co',
+              },
+            },
+          },
+          portis: {
+            package: Portis,
+            options: {
+              id: '34616571-d57b-4805-868b-2dcc7b7662d7',
+              network: {
+                nodeUrl: 'https://public-node.testnet.rsk.co',
+                chainId: 31,
+              },
+            },
+          },
+        },
+        supportedChains: [30, 31],
+      }),
     };
   },
   props: {
@@ -95,6 +118,7 @@ export default {
       type: Array,
       required: true,
     },
+
   },
   computed: {
     ...mapState({
@@ -130,12 +154,17 @@ export default {
   methods: {
     ...mapActions({
       disconnectWallet: constants.SESSION_DISCONNECT_WALLET,
+      connectToWeb3: constants.SESSION_CONNECT_WEB3,
     }),
+
     outsideConnectWallet() {
       this.showModalConnectWallet = false;
     },
+
     showDialogConnectWallet() {
-      if (!this.isWalletConnected) this.showModalConnectWallet = true;
+      this.rLogin
+        .connect() // shows rLogin modal
+        .then(({ provider }) => this.connectToWeb3(provider));
     },
     disconnectAccount() {
       this.disconnectWallet();
@@ -169,7 +198,6 @@ export default {
     },
   },
   components: {
-    ConnectWallet,
   },
 };
 </script>

@@ -54,7 +54,8 @@
       </v-col>
     </v-row>
     <v-row class="ma-0 container">
-      <v-btn depressed :color="buttonColor" width="100%" height="44" @click="supplyOrBorrow">
+      <!-- eslint-disable max-len -->
+      <v-btn depressed :color="buttonColor" width="100%" height="44" @click="supplyOrBorrow" :disabled=isDisabled>
         <span class="b1-main">{{ buttonName }}</span>
       </v-btn>
     </v-row>
@@ -150,6 +151,9 @@ export default {
       walletAddress: (state) => state.Session.walletAddress,
       chainId: (state) => state.Session.chainId,
       account: (state) => state.Session.account,
+      isDisabled() {
+        return !this.isLoggedIn;
+      },
     }),
     ...mapGetters({
       isLoggedIn: constants.SESSION_IS_CONNECTED,
