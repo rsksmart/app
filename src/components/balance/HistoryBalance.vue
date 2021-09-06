@@ -70,7 +70,7 @@
             <div class="h2-heading">
               <div class="">{{activity.market}}</div>
               <div class="p1-descriptions">
-                {{ textMicroSavings(activity.marketAddress) }}
+                {{ textMicroSavings(activity.marketAddress, activity.event) }}
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@
               <span class="">{{activity.market}}</span>
             </div>
             <div class="p3-USD-value">
-              {{activity.priceAt | formatPrice(activity.market)}}
+              {{activity.priceAt * activity.amount | formatPrice(activity.market)}}
             </div>
           </div>
           <div class="p7-graphics">
@@ -112,8 +112,8 @@
         </div>
       </template>
 
-      <!-- Depositos -->
       <template v-for="(market, i) in getMarkets" >
+      <!-- Depositos -->
         <div class="d-flex justify-space-between activity mt-8" :key="i"
           v-if="market.supplyBalance > 0 && tabMenu === 'deposit'">
           <div class="d-flex">
@@ -135,7 +135,7 @@
               {{market.blanceUsd | formatPrice(market.symbol)}}
             </div>
           </div>
-          <div class="p7-graphics">
+          <!-- <div class="p7-graphics">
             {{$t('balance.table.deposit.description2')}} <br />
             <div class="p6-reading-values">
               {{market.interestBalance | formatDecimals(market.symbol)}}
@@ -144,7 +144,7 @@
             <div class="p3-USD-value">
               {{market.interesUsd | formatPrice}}
             </div>
-          </div>
+          </div> -->
           <div class="p7-graphics interes">
             {{$t('balance.table.deposit.description3')}}
             <br />
@@ -187,7 +187,7 @@
               {{market.borrowUsd | formatPrice}}
             </div>
           </div>
-          <div class="p7-graphics">
+          <!-- <div class="p7-graphics">
             {{$t('balance.table.debts.description2')}}<br />
             <div class="p6-reading-values">
               {{market.interestBorrow | formatDecimals(market.symbol)}}
@@ -196,7 +196,7 @@
             <div class="p3-USD-value">
               {{market.interestBorrowUsd | formatPrice}}
             </div>
-          </div>
+          </div> -->
           <div class="p7-graphics interes">
             {{$t('balance.table.debts.description3')}}<br />
             <div class="p6-reading-values">
@@ -270,7 +270,6 @@ export default {
       getMarkets: [],
       userActivity: [],
       timeHash: '',
-      rbtc: '0xE47b7c669F96B1E0Bf537bB27fF5C6264fe0d380',
       tutorial: false,
       transfer: false,
       amountRbtc: 0,
@@ -288,11 +287,11 @@ export default {
     }),
     totalDeposits() {
       return Object.entries(this.infoDeposits).length > 0
-        ? Number(this.infoDeposits.totalDeposits).toFixed(2) : 0;
+        ? Number(this.infoDeposits.totalDeposits) : 0;
     },
     totalBorrows() {
       return Object.entries(this.infoBorrows).length > 0
-        ? Number(this.infoBorrows.totalBorrows).toFixed(2) : 0;
+        ? Number(this.infoBorrows.totalBorrows) : 0;
     },
     validate_MM_NT() {
       return (this.wallet === this.MM || this.wallet === this.NT)
@@ -316,18 +315,29 @@ export default {
   watch: {
     dataMarkets() {
       this.getMarkets = this.dataMarkets;
-      console.log('data market', this.getMarkets);
     },
     dataActivity() {
       this.userActivity = this.dataActivity;
-      console.log('mi actividad', this.userActivity);
     },
   },
   methods: {
-    textMicroSavings(marketAddress) {
-      return addresses[this.chainId].kSAT === marketAddress
-        ? 'micro saving'
-        : '';
+    textMicroSavings(marketAddress, event = '') {
+      if (this.tabMenu === 'activity' && (event === 'Mint' || event === 'Redeem')
+        && marketAddress === addresses[this.chainId].kSAT) {
+        return 'micro saving';
+      }
+      if (this.tabMenu === 'activity' && (event === 'Borrow' || event === 'RepayBorrow')
+        && marketAddress === addresses[this.chainId].kSAT) {
+        return 'micro borrowing';
+      }
+      if (this.tabMenu === 'deposit' && marketAddress === addresses[this.chainId].kSAT
+      ) {
+        return 'micro saving';
+      }
+      if (this.tabMenu === 'debts' && marketAddress === addresses[this.chainId].kSAT) {
+        return 'micro borrowing';
+      }
+      return '';
     },
     redirect(routePath, marketAddress = '', menu = 'true') {
       if (marketAddress === '') {
@@ -343,7 +353,7 @@ export default {
       this.getMarkets = this.dataMarkets;
       this.userActivity = this.dataActivity;
 
-      const market = new CRbtc(this.rbtc, this.chainId);
+      const market = new CRbtc(addresses[this.chainId].kRBTC, this.chainId);
       this.amountRbtc = await market.balanceOfUnderlyingInWallet(this.account);
     },
     eventType(type) {
@@ -360,8 +370,6 @@ export default {
       navigator.clipboard.writeText(hash);
       this.tooltip = true;
       this.timeHash = time;
-      console.log('tooltip', this.tooltip);
-      console.log('market', time);
       setTimeout(() => {
         this.tooltip = false;
         this.timeHash = '';

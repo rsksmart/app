@@ -97,6 +97,14 @@
       "description6": "You have paid",
       "btn": "Continue"
     },
+    "firstTransaction": {
+      "title": "Authorize all 3 transactions",
+      "transactions": [
+        "Authorize the transaction amount",
+        "Authorize the transaction",
+        "Authorize your deposits as collateral"
+      ]
+    },
     "error": {
       "description1": "The deposit could not be completed. Please try again later.",
       "description2": "The withdrawal could not be completed. Please try again later.",
@@ -248,6 +256,13 @@
       "title5": "Current dynamic annual interest rate"
     }
   },
+  "notify": {
+    "description1": "You have deposited",
+    "description2": "You have withdrawn",
+    "description3": "You borrowed",
+    "description4": "You have paid",
+    "description5": "Go to RSK explorer"
+  },
   "menu": {
     "sidebar": {
       "balance": "My Balance",
@@ -257,7 +272,7 @@
       "school": "Tropykus School",
       "markets": "Markets",
       "protocol": "About Tropykus",
-      "language": "English",
+      "language": "Español",
       "github": "Repository"
     },
     "navbar": {
@@ -269,11 +284,55 @@
     }
   },
   "internal-metrics": {
-    "title": "Reserves",
+    "title": "Users metrics",
     "number-addresses": "Number of unique addresses",
+    "number-new-addresses": "Number of new users",
+    "number-retire-addresses": "Number of retire users",
+    "number-active-addresses": "Today's active users",
     "total-subsidy": "Total subsidy fund",
     "market": "Market",
-    "total-reserves": "Total Reserves"
+    "total-reserves": "Total Reserves",
+    "dropdown": [
+      {
+        "title": "Total number of active addresses",
+        "collection": "active-users",
+        "index": 0
+      },
+      {
+        "title": "Total value Locked",
+        "collection": "value-locked",
+        "index": 1
+      },
+      {
+        "title": "Total number of deposits",
+        "collection": "new-deposits",
+        "index": 2
+      },
+      {
+        "title": "Total number of loans",
+        "collection": "new-borrows",
+        "index": 3
+      },
+      {
+        "title": "Number of new users",
+        "collection": "new-users",
+        "index": 4
+      }
+    ],
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    }
   },
   "borrows": {
     "title": "You can borrow and multiply your earnings",
@@ -301,30 +360,30 @@
     "description1": "Select the crypto to pay",
     "description2": "Write the amount you are going to pay",
     "description3": "You borrowed",
-    "description4": "Approximate accrued interest",
+    "description4": "You must pay",
     "btn1": "Connect wallet",
     "btn2": "Pay"
   },
   "deposits": {
     "title": "Deposit your RBTC and earn 4% per year",
-    "description": "Get the earnings of your bitcoins by converting them into RBTC or buy RBTC",
-    "subtitle": "Deposit your crypto and get profit",
+    "description": "Get the earnings of your Bitcoin by converting them into RBTC",
+    "subtitle": "Deposit your crypto and get earning",
     "btn1": "Convert BTC to RBTC",
     "btn2": "Buy RBTC"
   },
   "deposit": {
-    "title": "Deposit your crypto and get profit",
+    "title": "Deposit your crypto and get earning",
     "subtitle1": "Deposit",
     "subtitle2": "Withdraw",
     "description1": "Select the crypto to deposit",
     "description2": "Write the amount you are going to deposit",
     "description3": "You have in your wallet",
-    "description4": "Current dynamic annual profit rate",
+    "description4": "Current dynamic annual earning rate",
     "micro": "Choose your annual earning rate",
     "btn1": "Connect wallet",
     "btn2": "Deposit",
     "calculator": {
-      "title": "Calculate profit",
+      "title": "Calculate earning",
       "description1": "Total earnings",
       "description2": "Write the amount you are going to deposit",
       "description3": "Total earnings + deposit",
@@ -335,7 +394,7 @@
     "description5": "Do you want to have a better chance of winning using your funds?",
     "description6": "Take a look at strategies",
     "tooltip1": "The interest rate varies when other users carry out transactions in the protocol.",
-    "tooltip2": "This calculator only simulates the earnings that could be obtained in a certain period of time. The figures shown vary according to the annual dynamic profit rate and the prices of the cryptocurrencies, therefore it is not a guarantee of future profits.",
+    "tooltip2": "This calculator only simulates the earnings that could be obtained in a certain period of time. The figures shown vary according to the annual dynamic earning rate and the prices of the cryptocurrencies, therefore it is not a guarantee of future earning.",
     "tooltip3": "This value corresponds to the total deposited plus the accumulated earnings so far.",
     "microsavings": {
       "description1": "Microsaving",
@@ -348,18 +407,24 @@
     "title": "Withdraw",
     "description1": "Select the crypto to withdraw",
     "description2": "Write the amount you are going to withdraw",
-    "description3": "You have deposited + earnings",
+    "description3": "Remaining to the 0.1 RBTC limit is:",
+    "description4": "You have deposited:",
     "btn1": "Connect wallet",
     "btn2": "Withdraw"
   },
   "balance": {
-    "title": "Balance Sheet",
+    "title": "General Balance",
     "tooltip1": "This value in USD is the total sum of all the cryptos that you have deposited in Tropykus.",
     "tooltip2": "This value in USD is the total sum of all the cryptos that you borrowed from Tropykus.",
+    "tooltip3": "This value corresponds to your maximum loan capacity with respect to all your deposits. It is usually between 60 and 70%, depending on the coins in which you have deposited.",
+    "tooltip4": "Your level of risk is when you approach the limit of the total of what you can borrow. That is, the higher the total amount of your debts, the more risk you have of being liquidated.",
     "deposit": {
       "description1": "You have deposited",
       "description2": "Deposited",
       "description3": "Accumulated earnings"
+    },
+    "liquidity": {
+      "description1":"You can borrow"
     },
     "debts": {
       "description1": "You must pay",
@@ -405,7 +470,7 @@
         "other": "Risk cannot be calculated"
       },
       "description": {
-        "risk": "of your deposits are committed in debts",
+        "risk": "of what you can borrow is in debt.",
         "liquidated": "of your deposits have been liquidated"
       }
     },
@@ -413,7 +478,7 @@
       "deposit": {
         "description1": "Total deposited",
         "description2": "Accumulated earnings",
-        "description3": "Current annual profit \nrate",
+        "description3": "Current annual earning rate",
         "btn1": "Deposit",
         "btn2": "Withdraw"
       },
@@ -428,7 +493,7 @@
         "description1": "Activity",
         "description2": "Amount",
         "description3": "Date",
-        "description4": "Hash of the transaction"
+        "description4": "Transaction Hash"
       }
     },
     "events": {
@@ -451,5 +516,36 @@
     "btn2": "Connect wallet",
     "tooltip1": "This is the equivalent value between the two selected currencies",
     "tooltip2": "The value you will receive for the exchange can be up to 1% less than the initial amount of the transaction. Keep in mind that to benefit you, if the minimum exceeds the 1% limit, the transaction will be canceled."
+  },
+  "feedback": {
+    "chooseAChannel": {
+      "title": "Do you need help?",
+      "description": "You can ask for help in our Telegram community, or send a direct message to the Tropykus team.",
+      "telegram": "Go to Telegram",
+      "comment": "Send comment"
+    },
+    "sendAComment": {
+      "title": "Send us your comments",
+      "mandatory": "Required",
+      "emailField": "Write your email to be able to contact you",
+      "emailPlaceholder": "Write your email",
+      "walletField": "Select the wallet you used",
+      "walletOptions": [
+        "Liquality",
+        "Defiant",
+        "Metamask",
+        "Nifty"
+      ],
+      "sectionField": "Choose the section where you had problems",
+      "sectionOptions": [
+        "Deposit",
+        "Borrow",
+        "Balance",
+        "Exchange"
+      ],
+      "problemField": "Write the problem you have",
+      "problemPlaceholder": "Write your message",
+      "button": "Send"
+    }
   }
 }

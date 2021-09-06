@@ -4,8 +4,8 @@
   z-index: 200;
   .logo-tropykus{
     margin: 40px 0 0 12px;
-    width: 137px;
-    height: 31px;
+    width: 134px;
+    height: 39px;
   }
   .left-bar-content{
     width:254px !important;
@@ -76,8 +76,8 @@
       height: 28px !important;
     }
     .logo-tropykus{
-      width: 133px !important;
-      height: 31px !important;
+      width: 134px !important;
+      height: 39px !important;
       margin-top: 20px !important;
     }
     .list-left-bar{
@@ -120,5 +120,13 @@
   }
   ::-webkit-scrollbar-thumb {
     background: rgba(136, 136, 136, 0.4);
+  }
+}
+
+.feedback-bubble {
+  .feedback-button-container {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
   }
 }

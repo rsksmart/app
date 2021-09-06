@@ -21,7 +21,7 @@ $bg-balance: #E6F1EB;
     margin-top: 31px;
     display: grid;
     grid-template-columns: 224px 287px 224px;
-    grid-template-rows: 287px repeat(2);
+    grid-template-rows: repeat(3, 101px);
     justify-content: space-between;
     .p6-reading-values{
       font-size: 16px !important;
@@ -35,6 +35,12 @@ $bg-balance: #E6F1EB;
       grid-column: 1 / 2;
       grid-row: 1 / 4;
       padding: 0 24px 0 24px;
+      position: relative;
+      .tooltip-info{
+        position: absolute;
+        top: 15px;
+        right: 20px;
+      }
       .risk {
         width: 108px !important;
         height: 109px !important;
@@ -57,13 +63,36 @@ $bg-balance: #E6F1EB;
         }
       }
     }
+    .p3-USD-values {
+      font-size: 12px !important;
+    }
     .balance-deposit{
       width: 287px;
-      height: 140px;
+      height: 85px;
       grid-column: 2 / 3;
       grid-row: 1 / 2;
-      padding: 29px 20px 24px 18px;
+      padding: 17px 20px 15px 27px;
       position: relative;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      .tooltip-info{
+        position: absolute;
+        top: 15px;
+        right: 20px;
+      }
+    }
+    .balance-liquidity{
+      width: 287px;
+      height: 85px;
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+      padding: 17px 20px 15px 27px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-self: center;
       .tooltip-info{
         position: absolute;
         top: 15px;
@@ -72,11 +101,15 @@ $bg-balance: #E6F1EB;
     }
     .balance-borrow{
       width: 287px;
-      height: 140px;
+      height: 85px;
       grid-column: 2 / 3;
       grid-row: 3 / 4;
-      padding: 29px 20px 24px 18px;
+      padding: 17px 20px 15px 27px;
       position: relative;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-self: flex-end;
       .tooltip-info{
         position: absolute;
         top: 15px;
@@ -88,8 +121,6 @@ $bg-balance: #E6F1EB;
       height: 305px;
       grid-column: 3 / 4;
       grid-row: 1 / 4;
-      // padding-top: 24px;
-
       .chart{
         position: relative;
         img{
@@ -98,7 +129,6 @@ $bg-balance: #E6F1EB;
           left: 41%;
         }
       }
-
       .cripto-chart{
         width: 115px;
         height: 115px;

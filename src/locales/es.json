@@ -99,6 +99,14 @@
       "description6": "Has pagado",
       "btn": "Continuar"
     },
+    "firstTransaction": {
+      "title": "Autoriza las 3 transacciones",
+      "transactions": [
+        "Autoriza el monto de la transacción",
+        "Autoriza la transacción",
+        "Autorizar tus depósitos como colateral"
+      ]
+    },
     "error": {
       "description1": "No se pudo completar el depósito. Intenta más tarde",
       "description2": "No se pudo completar el retiro. Intenta más tarde.",
@@ -250,6 +258,13 @@
       "title5": "Tasa de interés anual \rdinámica actual"
     }
   },
+  "notify": {
+    "description1": "Has depositado",
+    "description2": "Has retirado",
+    "description3": "Has pedido prestado",
+    "description4": "Has pagado",
+    "description5": "Ver transacción en RSK explorer"
+  },
   "menu": {
     "sidebar": {
       "balance": "Balance General",
@@ -259,7 +274,7 @@
       "school": "Escuela Tropykus",
       "markets": "Mercados",
       "protocol": "Sobre Tropykus",
-      "language": "Español",
+      "language": "English",
       "github": "Repository"
     },
     "navbar": {
@@ -271,11 +286,55 @@
     }
   },
   "internal-metrics": {
-    "title": "Reservas",
-    "number-addresses": "Numero de direcciones unicas",
+    "title": "Métricas de usuario",
+    "number-addresses": "Número de direcciones unicas",
+    "number-new-addresses": "Número de usuarios ganados",
+    "number-retire-addresses": "Número de usuarios retirados",
+    "number-active-addresses": "Usuarios activos hoy",
     "total-subsidy": "Total fondo de subsidio",
     "market": "Mercado",
-    "total-reserves": "Total Reservas"
+    "total-reserves": "Total Reservas",
+    "dropdown": [
+      {
+        "title": "Número total de usuarios activos",
+        "collection": "active-users",
+        "index": 0
+      },
+      {
+        "title": "Valor total almacenado",
+        "collection": "value-locked",
+        "index": 1
+      },
+      {
+        "title": "Número total de depósitos",
+        "collection": "total-deposits",
+        "index": 2
+      },
+      {
+        "title": "Número total de deudas",
+        "collection": "total-borrows",
+        "index": 3
+      },
+      {
+        "title": "Número de nuevos usuarios",
+        "collection": "new-users",
+        "index": 4
+      }
+    ],
+    "months": {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    }
   },
   "borrows": {
     "title": "Pide prestado y multiplica tus ganancias",
@@ -304,13 +363,13 @@
     "description1": "Selecciona la cripto a pagar",
     "description2": "Escribe la cantidad que vas a pagar",
     "description3": "Pediste prestado",
-    "description4": "Intereses acumulados aproximados",
+    "description4": "Debes pagar",
     "btn1": "Conectar billetera",
     "btn2": "Pagar"
   },
   "deposits": {
     "title": "Deposita tus RBTC y gana el 4% anual",
-    "description": "Saca rendimiento de tus bitcoins convirtiendolos en RBTC o compra RBTC",
+    "description": "Obtén ganancias de tus Bitcoin convirtiendolos en RBTC.",
     "subtitle": "Deposita tus criptos y obten ganancias",
     "btn1": "Convertir BTC a RBTC",
     "btn2": "Comprar RBTC"
@@ -351,7 +410,8 @@
     "title": "Retirar",
     "description1": "Selecciona la cripto a retirar",
     "description2": "Escribe la cantidad que vas a retirar",
-    "description3": "Tienes depositado + ganancinas",
+    "description3": "El límite restante a 0.1 RBTC es:",
+    "description4": "Tienes depositado:",
     "btn1": "Conectar billetera",
     "btn2": "Retirar"
   },
@@ -359,10 +419,15 @@
     "title": "Balance General",
     "tooltip1": "Este valor en USD es la suma total de todas las cryptos que tienes depositadas en Tropykus.",
     "tooltip2": "Este valor en USD es la suma total de todas las cryptos que pediste prestadas en Tropykus.",
+    "tooltip3": "Este valor corresponde a tu capacidad máxima de préstamo con respecto a todos tus depósitos. Suele estar entre el 60 y 70%, dependiendo de las monedas en las que hayas depositado.",
+    "tooltip4": "Tu nivel de riesgo es cuando te acercas al límite del total de lo que puedes pedir prestado. Es decir, entre más alto sea el monto total de tus deudas, más riesgo tienes de ser liquidado.",
     "deposit": {
       "description1": "Tienes depositado",
       "description2": "Depositados",
       "description3": "Ganancias acumuladas"
+    },
+    "liquidity": {
+      "description1":"Puedes pedir prestado"
     },
     "debts": {
       "description1": "Debes pagar",
@@ -408,7 +473,7 @@
         "other": "Risk cannot be calculated"
       },
       "description": {
-        "risk": "de tus depósitos están comprometidos en deudas",
+        "risk": "de lo que puedes pedir prestado está comprometido en deudas. ",
         "liquidated": "de tus depósitos han sido liquidados"
       }
     },
@@ -454,5 +519,36 @@
     "btn2": "Conectar billetera",
     "tooltip1": "Este es el valor equivalente entre las dos monedas seleccionadas",
     "tooltip2": "El valor que recibirás por el intercambio puede ser hasta 1% menor del monto inicial de la transacción. Ten en cuenta que para beneficiarte, si el minimo supera el límite del 1%, la transacción se cancelará. "
+  },
+  "feedback": {
+    "chooseAChannel": {
+      "title": "¿Necesitas ayuda?",
+      "description": "Puedes pedir ayuda en nuestra comunidad de Telegram, o enviar un mensaje directo al equipo Tropykus.",
+      "telegram": "Ir a Telegram",
+      "comment": "Enviar comentario"
+    },
+    "sendAComment": {
+      "title": "Envíanos tus comentarios",
+      "mandatory": "Obligatorio",
+      "emailField": "Escribe tu email para poderte contactar",
+      "emailPlaceholder": "Escribe tu email",
+      "walletField": "Selecciona la billetera que usaste",
+      "walletOptions": [
+        "Liquality",
+        "Defiant",
+        "Metamask",
+        "Nifty"
+      ],
+      "sectionField": "Elige la sección donde tuviste problemas",
+      "sectionOptions": [
+        "Depósitos",
+        "Préstamos",
+        "Balance",
+        "Intercambios"
+      ],
+      "problemField": "Escribe el problema que estás teniendo",
+      "problemPlaceholder": "Escribe tu mensaje",
+      "button": "Enviar"
+    }
   }
 }

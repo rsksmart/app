@@ -1,7 +1,6 @@
 <template>
   <div class="balance-borrow balance-style">
     <div class="d-flex">
-      <img src="@/assets/icons/pay2.svg" alt="Deposit">
       <div class="tooltip-info">
         <v-tooltip bottom
           content-class="secondary-color box-shadow-tooltip" max-width="180">
@@ -14,29 +13,22 @@
           </span>
         </v-tooltip>
       </div>
-      <div class="ml-5 p2-reading-values">
-        {{totalBorrowsByIntereses}} USD <br />
-        <span class="p1-descriptions">{{$t('balance.debts.description1')}}</span>
-      </div>
-    </div>
-    <v-divider class="mt-4 mb-2"></v-divider>
-    <div class="d-flex justify-space-between">
-      <div class="p6-reading-values">
-        {{totalBorrows}} USD <br />
-        <span class="p1-descriptions">
-          {{$t('balance.debts.description2')}}
-        </span>
-      </div>
-      <div class="p6-reading-values">
-        {{totalIntereses}} USD <br />
-        <span class="p1-descriptions">
-          {{$t('balance.debts.description3')}}
-        </span>
+      <img src="@/assets/icons/pay2.svg" alt="Deposit">
+      <div class="ml-5">
+        <div class="p1-descriptions mb-2">{{$t('balance.debts.description1')}}</div>
+        <div class="p2-reading-values mb-1">
+          {{totalBorrowsByIntereses}} USD
+        </div>
+        <div class="p3-USD-values">
+          {{!totalRbtc ? 0 : totalRbtc}} RBTC
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'DebtsBalance',
   props: {
@@ -44,8 +36,15 @@ export default {
       type: Object,
       require: true,
     },
+    priceRbtc: {
+      type: Number,
+      require: true,
+    },
   },
   computed: {
+    ...mapState({
+      chainId: (state) => state.Session.chainId,
+    }),
     totalBorrows() {
       return Object.entries(this.infoBorrows).length > 0
         ? this.infoBorrows.totalBorrows.toFixed(2) : 0;
@@ -58,6 +57,9 @@ export default {
       return Object.entries(this.infoBorrows).length > 0
         ? (this.infoBorrows.totalBorrowsByIntereses - this.infoBorrows.totalBorrows).toFixed(2)
         : 0;
+    },
+    totalRbtc() {
+      return (Number(this.totalBorrowsByIntereses) / this.priceRbtc).toFixed(6);
     },
   },
 };

@@ -37,7 +37,7 @@
       <div class="content-info">
         <div>
           <div class="p1-descriptions text-info mb-1">
-            {{ tabMenu ? $t('deposit.description3') : $t('withdraw.description3') }}
+            {{ tabMenu ? $t('deposit.description3') : $t('withdraw.description4') }}
           </div>
           <div class="p2-reading-values text-info">
             {{ !tokenBalance ? 0 : tokenBalance | formatDecimals(select.underlyingSymbol) }}
@@ -47,13 +47,14 @@
             {{ !tokenBalanceUsd ? 0 : tokenBalanceUsd | formatPrice}}
           </div>
         </div>
-        <div v-if="tabMenu && marketAddress === addresses[chainId].kSAT && info.supplyBalance > 0"
+        <div v-if="tabMenu && marketAddress === addresses[chainId].kSAT && info.supplyBalance > 0
+            && typeMarket === 'micro'"
           class="mt-12">
           <div class="d-flex">
             <div class="p1-descriptions text-info mb-1">
               {{ $t('withdraw.description3') }}
             </div>
-            <div class="tooltip-info ml-7">
+            <!-- <div class="tooltip-info ml-7">
               <v-tooltip right content-class="secondary-color box-shadow-tooltip" max-width="180">
                 <template v-slot:activator="{ on, attrs }">
                   <v-img v-bind="attrs" v-on="on" width="15" height="15"
@@ -63,15 +64,15 @@
                   {{ $t('deposit.tooltip3') }}
                 </span>
               </v-tooltip>
-            </div>
+            </div> -->
           </div>
           <div class="p2-reading-values text-info">
             {{ !info.supplyBalance ? 0
-              : info.supplyBalance | formatDecimals(select.underlyingSymbol)}}
+              : (0.1 - info.supplyBalance) | formatDecimals(select.underlyingSymbol)}}
             {{select.underlyingSymbol}}
           </div>
           <div class="p3-USD-values text-info">
-            {{ !info.supplyBalance ? 0 : info.supplyBalance * info.price | formatPrice}}
+            {{ !info.supplyBalance ? 0 : (0.1 - info.supplyBalance) * info.price | formatPrice}}
           </div>
         </div>
         <div v-if="tabMenu" class="content-rate">
@@ -217,15 +218,11 @@
       />
     </template>
 
-    <template v-if="isLoading">
-      <loading :showModal="isLoading" :data="infoLoading" @closed="closeDialog" />
-    </template>
   </div>
 </template>
 <script>
 import { mapState, mapActions } from 'vuex';
 import ConnectWallet from '@/components/dialog/ConnectWallet.vue';
-import Loading from '@/components/modals/Loading.vue';
 import Dropdown from '@/components/general/Dropdown.vue';
 import Savings from '@/components/deposits/Savings.vue';
 import * as constants from '@/store/constants';
@@ -239,7 +236,6 @@ export default {
   name: 'Deposit',
   components: {
     ConnectWallet,
-    Loading,
     Dropdown,
     Savings,
   },
@@ -274,7 +270,7 @@ export default {
       amountEarning: null,
       info: {},
       liquidity: 0,
-      rules: {
+      rules: { // apalancamiento
         leverage: () => ((this.tabMenu && this.account && this.amount)
           ? this.info.borrowBalance <= 0 : true) || this.$t('dialog.supply-redeem.rule1'),
         minBalance: () => ((this.tabMenu && this.account && this.amount)
@@ -287,7 +283,7 @@ export default {
           ? this.info.supplyBalance !== 0 : true)
           || this.$t('dialog.supply-redeem.rule4'),
         collateral: () => ((!this.tabMenu && this.amount > 0)
-          ? this.amount <= this.withdraw : true)
+          ? this.info.borrowBalance <= 0 : true)
           || this.$t('dialog.supply-redeem.rule5'),
         typeMarket: () => (((this.typeMarket === '' && this.amount && this.tabMenu
           && this.account && this.isCRBTC))
@@ -296,7 +292,6 @@ export default {
         minkRBTC: () => (this.marketAddress === addresses[this.chainId].kSAT && this.typeMarket !== ''
           ? (Number(this.info.supplyBalance) + Number(this.amount)) <= 0.1 : true)
           || this.$t('dialog.supply-redeem.rule7'),
-
       },
     };
   },
@@ -397,84 +392,17 @@ export default {
         this.showModalConnectWallet = true;
         return;
       }
-      this.isLoading = true;
-      this.infoLoading.loading = true;
-      this.infoLoading.wallet = true;
-      this.infoLoading.symbol = this.select.underlyingSymbol;
-      this.counterAction = 1;
-      if (this.tabMenu) {
-        // colocar los mercados en assetsIn
-        const assetsIn = await this.comptroller.getAssetsIn(this.walletAddress);
-        const allMarkets = await this.comptroller.allMarkets();
-        if (assetsIn.indexOf(this.marketAddress) === -1) {
-          await this.comptroller.enterMarkets(this.account, allMarkets);
-        }
-        await this.market.supply(this.account, this.amount)
-          .then((tx) => {
-            this.infoLoading.wallet = false;
-            this.market.wsInstance.on('Mint', async (from, actualMintAmount) => {
-              if (from === this.walletAddress && Number(this.amount) === actualMintAmount / 1e18) {
-                if (!this.isLoading) {
-                  this.isLoading = true;
-                }
-                this.infoLoading.loading = false;
-                this.infoLoading.deposit = true;
-                this.infoLoading.amount = actualMintAmount / 1e18;
-                if (this.counterAction === 1) {
-                  await this.firestore.saveUserAction(
-                    this.comptroller.comptrollerAddress,
-                    this.walletAddress,
-                    'Mint',
-                    actualMintAmount / 1e18,
-                    this.info.underlyingSymbol,
-                    this.market.marketAddress,
-                    this.info.underlyingPrice,
-                    new Date(),
-                    tx.hash,
-                  );
-                }
-                this.counterAction = 0;
-                setTimeout(() => {
-                  this.getMarket();
-                }, 2000);
-              }
-            });
-          })
-          .catch(console.error);
-      } else {
-        this.market.redeem(this.account, this.amount)
-          .then((tx) => {
-            this.infoLoading.wallet = false;
-            this.market.wsInstance.on('Redeem', async (from, actualRedeemAmount) => {
-              if (from === this.walletAddress) {
-                if (!this.isLoading) {
-                  this.isLoading = true;
-                }
-                this.infoLoading.loading = false;
-                this.infoLoading.deposit = false;
-                this.infoLoading.amount = actualRedeemAmount / 1e18;
-                if (this.counterAction === 1) {
-                  await this.firestore.saveUserAction(
-                    this.comptroller.comptrollerAddress,
-                    this.walletAddress,
-                    'Redeem',
-                    actualRedeemAmount / 1e18,
-                    this.info.underlyingSymbol,
-                    this.market.marketAddress,
-                    this.info.underlyingPrice,
-                    new Date(),
-                    tx.hash,
-                  );
-                }
-                this.counterAction = 0;
-                setTimeout(() => {
-                  this.getMarket();
-                }, 2000);
-              }
-            });
-          })
-          .catch(console.error);
-      }
+
+      this.$store.dispatch({
+        type: constants.USER_ACTION,
+        market: this.market,
+        action: this.tabMenu ? constants.USER_ACTION_MINT : constants.USER_ACTION_REDEEM,
+        amount: this.amount,
+        symbol: this.select.underlyingSymbol,
+        price: this.info.underlyingPrice,
+      });
+
+      this.reset();
 
       this.market.wsInstance.on('TokenFailure', (from, to, amount, event) => {
         console.info(`Failure from ${from} Event: ${JSON.stringify(event)}`);
@@ -529,14 +457,15 @@ export default {
       this.showModalConnectWallet = false;
     },
     setAmount() {
-      this.amount = (this.sliderAmountPercentage * this.tokenBalance) / 100;
-      if (this.account) {
-        this.amount = this.amount.toFixed(10);
+      if (this.sliderAmountPercentage === 100) {
+        this.amount = this.tabMenu ? this.info.underlyingBalance : this.info.supplyBalance;
+      } else {
+        this.amount = (this.sliderAmountPercentage * this.tokenBalance) / 100;
       }
     },
     setMaxAmount() {
       if (this.account) {
-        this.amount = this.tabMenu ? this.info.underlyingBalance : this.info.supplyBalance;
+        this.amount = this.tabMenu ? this.info.underlyingBalance : this.withdraw;
         this.setPercentageSlider();
       }
     },

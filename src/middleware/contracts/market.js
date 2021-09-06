@@ -130,13 +130,9 @@ export default class Market {
     return Number(await this.instance.callStatic.balanceOf(address)) / factor;
   }
 
-  async currentBalanceOfCTokenInUnderlying(address, isCRbtc = false) {
-    if (isCRbtc) {
-      const supplysnapshot = await this.instance.getSupplierSnapshotStored(address);
-      return Number(supplysnapshot[1]) / factor;
-    }
+  async currentBalanceOfCTokenInUnderlying(address) {
     const cTokenBalance = await this.balanceOf(address);
-    const exchangeRate = await this.exchangeRateStored();
+    const exchangeRate = await this.exchangeRateCurrent();
     return (cTokenBalance * exchangeRate);
   }
 
@@ -159,6 +155,10 @@ export default class Market {
 
   async exchangeRateStored() {
     return Number(await this.instance.callStatic.exchangeRateStored()) / factor;
+  }
+
+  async getTotalSupply() {
+    return Number(await this.instance.callStatic.totalSupply()) / factor;
   }
 
   async getReserves() {
@@ -276,7 +276,7 @@ export default class Market {
 
   async supply(account, amountIntended, isCRbtc = false) {
     const accountSigner = signer(account);
-    const value = await Market.getAmountDecimals(amountIntended);
+    const value = Market.getAmountDecimals(amountIntended);
     if (isCRbtc) {
       return this.instance.connect(accountSigner).mint({ value, gasLimit: this.gasLimit });
     }
@@ -301,21 +301,52 @@ export default class Market {
     return this.instance.connect(accountSigner).redeem(amount, { gasLimit: this.gasLimit });
   }
 
-  async repay(account, amountIntended) {
+  async repay(account, amountIntended, walletAddress) {
+    console.log('amountIntended', amountIntended);
+    console.log('account', account);
     const accountSigner = signer(account);
-    const value = amountIntended === -1 ? '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-      : await ethers.utils.parseEther(`${amountIntended}`);
+    let value = 0;
+    if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
+      const borrowBalanceCurrent = await this.borrowBalanceCurrent(walletAddress);
+      console.log('borrowBalanceCurrent', borrowBalanceCurrent);
+      value = amountIntended === -1 ? Market.getAmountDecimals(borrowBalanceCurrent)
+        : Market.getAmountDecimals(amountIntended);
+      console.log(value);
+      return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
+    }
+    value = amountIntended === -1 ? '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+      : Market.getAmountDecimals(amountIntended);
     const underlyingAsset = new ethers.Contract(
       await this.underlying(),
       StandardTokenAbi,
       Vue.web3,
     );
     await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
-    if (await Market.isCRbtc(this.marketAddress)) {
-      return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
-    }
     return this.instance.connect(accountSigner).repayBorrow(value, { gasLimit: this.gasLimit });
   }
+
+  // async repay(account, amountIntended) {
+  //   const accountSigner = signer(account);
+  //   let value = 0;
+  //   // : await ethers.utils.parseEther(`${amountIntended}`);
+  //   if (amountIntended === -1) {
+  //     value = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+  //   } else {
+  //     value = Market.getAmountDecimals(amountIntended);
+  //   }
+
+  //   if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
+  //     return this.instance.connect(accountSigner)
+  //      .repayBorrow({ value, gasLimit: this.gasLimit });
+  //   }
+  //   const underlyingAsset = new ethers.Contract(
+  //     await this.underlying(),
+  //     StandardTokenAbi,
+  //     Vue.web3,
+  //   );
+  //   await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
+  //   return this.instance.connect(accountSigner).repayBorrow(value, { gasLimit: this.gasLimit });
+  // }
 
   async suppliedLast24Hours(chainId) {
     const supplyEvents = await this.instance.queryFilter('Mint', -2880);

@@ -43,6 +43,12 @@ export default [
     component: () => import(/* webpackChunkName: "Balance" */ '@/views/Balance.vue'),
   },
   {
+    path: '/building',
+    name: 'Building',
+    meta: { requiredWallet: true },
+    component: () => import(/* webpackChunkName: "Balance" */ '@/views/Building.vue'),
+  },
+  {
     path: '/overview',
     name: 'Overview',
     component: () => import(/* webpackChunkName: "Overview" */ '@/views/Overview.vue'),
@@ -56,30 +62,5 @@ export default [
     path: '/internal-metrics',
     name: 'InternalMetrics',
     component: () => import(/* webpackChunkName: "Metrics" */ '@/views/InternalMetrics.vue'),
-  },
-  {
-    path: '/tutorials/btc-to-rbtc',
-    name: 'BtcToRbtc',
-    component: () => import(/* webpackChunkName: "BtcToRbtc" */ '@/components/tutorials/BtcToRbtc.vue'),
-  },
-  {
-    path: '/tutorials/binance-to-liquality',
-    name: 'BinanceToLiquality',
-    component: () => import(/* webpackChunkName: "BinanceToLiquality" */ '@/components/tutorials/BinanceToLiquality.vue'),
-  },
-  {
-    path: '/tutorials/blockfi-to-liquality',
-    name: 'BlockfiToLiquality',
-    component: () => import(/* webpackChunkName: "BlockfiToLiquality" */ '@/components/tutorials/BlockfiToLiquality.vue'),
-  },
-  {
-    path: '/tutorials/ledn-to-liquality',
-    name: 'LednToLiquality',
-    component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/components/tutorials/LednToLiquality.vue'),
-  },
-  {
-    path: '/trade-swaps',
-    name: 'Exchanges',
-    component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/views/TradeSwaps.vue'),
   },
 ];

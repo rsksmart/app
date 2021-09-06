@@ -67,8 +67,12 @@ const actions = {
     const {
       walletAddress, account, page,
     } = data;
+<<<<<<< HEAD
     const market = (data.isDestSwapMarket) ? state.dest_market : state.market;
 
+=======
+    const { market } = state;
+>>>>>>> test2
     info.underlyingSymbol = await market.underlyingAssetSymbol();
     info.rate = page === constants.ROUTE_NAMES.DEPOSITS
       ? await market.supplyRateAPY()
@@ -82,8 +86,10 @@ const actions = {
       info.underlyingBalance = await market.balanceOfUnderlyingInWallet(account);
       info.price = await market.underlyingCurrentPrice(state.chainId);
       info.supplyBalance = await market.currentBalanceOfCTokenInUnderlying(walletAddress);
-      info.supplyBalance = info.supplyBalance ? info.supplyBalance : 0;
+      info.supplyBalance = (info.supplyBalance * info.price) <= 1e-5 ? 0 : info.supplyBalance;
       info.borrowBalance = await market.borrowBalanceCurrent(walletAddress);
+      info.borrowBalance = (info.borrowBalance * info.price) <= 1e-5 ? 0 : info.borrowBalance;
+      // info.borrowBalanceStored = await market.borrowBalanceStored(walletAddress);
       info.interestBalance = await market.getEarnings(walletAddress);
     } else {
       commit(constants.MARKET_RESET_MARKET);

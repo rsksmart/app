@@ -9,25 +9,19 @@
       </p>
     </div>
     <div class="d-flex justify-center actions-bottons">
-      <!-- <v-btn class="btn mr-9" text>
-        <span class="b1-main text-primary">
-          {{ $t('borrows.btn1') }}
-        </span>
-      </v-btn> -->
       <v-btn class="btn btn-secondary" text @click="redirect(constants.ROUTE_NAMES.DEPOSITS)">
         <span class="b1-main">
           {{ $t('borrows.btn2') }}
         </span>
       </v-btn>
     </div>
-
     <v-row class="ma-0">
       <p class="h3-sections-heading text-info">
-          {{ $t('borrows.subtitle') }}
+        {{ $t('borrows.subtitle') }}
       </p>
     </v-row>
 
-    <landing :inBorrowMenu="inBorrowMenu" :key="key" />
+    <landing />
 
   </div>
 </template>
@@ -41,8 +35,6 @@ export default {
   data() {
     return {
       constants,
-      inBorrowMenu: true,
-      key: 0,
     };
   },
   components: {
@@ -53,16 +45,6 @@ export default {
       const to = { name: path };
       this.$router.push(to);
     },
-  },
-  created() {
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', () => {
-        this.key += 1;
-      });
-      window.ethereum.on('chainChanged', () => {
-        this.key += 1;
-      });
-    }
   },
 };
 </script>

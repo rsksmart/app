@@ -6,6 +6,58 @@ body{
   flex: 1;
   width: 100%;
 }
+//=======================
+//  Animation
+//=======================
+.words {
+  color: #E6F1EB;
+  font-size: 0;
+  line-height: 1.5;
+}
+.words span {
+  font-size: 5rem;
+  display: inline-block;
+  animation: move 4s ease-in-out infinite;
+}
+@keyframes move {
+  0% {
+    transform: translate(-30%, 0);
+  }
+  50% {
+    text-shadow: 0 25px 50px rgba(121, 121, 121, 0.75);
+    // color: #196635;
+  }
+  100% {
+    transform: translate(30%, 0);
+  }
+}
+.words span:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.words span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.words span:nth-child(4) {
+  animation-delay: 1.5s;
+}
+
+.words span:nth-child(5) {
+  animation-delay: 2s;
+}
+
+.words span:nth-child(6) {
+  animation-delay: 2.5s;
+}
+
+.words span:nth-child(7) {
+  animation-delay: 3s;
+}
+.words span:nth-child(8) {
+  animation-delay: 3.5s;
+}
+
 .navbar-vue{
   padding-top: 54px;
   margin-right: 42px;
@@ -51,6 +103,50 @@ body{
 }
 .secondary-bg{
   background-color: $secondary-bg;
+}
+.content-notifications{
+  position: fixed;
+  top: 10px;
+  z-index: 200;
+  right: 0;
+  margin-right: 10px;
+  .notifications {
+    padding: 31px 40px 37px 29px;
+    margin-top: 20px;
+    width: 320px !important;
+    height: 142px !important;
+    box-shadow: -15px 20px 50px rgba(24, 24, 24, 0.15) !important;
+    border-radius: 10px !important;
+    &.hidden{
+      right: -500px;
+      transition: right 1s ease;
+    }
+    &.show {
+      right: 0px;
+      transition: right 1s ease;
+    }
+    .b1-main{
+      font-size: 15px !important;
+    }
+    img{
+      width: 31px;
+      height: 31px;
+    }
+    .btn-close{
+      cursor: pointer;
+      position: absolute;
+      font-size: 17px !important;
+      width: 8px;
+      height: 8px;
+      top: 17px;
+      right: 17px;
+    }
+    .link{
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+    }
+  }
 }
 //=======================
 //  input select textarea
@@ -165,6 +261,16 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
     width: 137px !important;
   }
 }
+//metrics select box
+.v-menu__content{
+  .metrics-select-menu-item {
+    width: auto;
+    height: 62px;
+  }
+  .active{
+    background-color: #CDE9DA;
+  }
+}
 
 .theme--light.v-list {
   color: rgba(0, 0, 0, 0.87);
@@ -188,6 +294,8 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
   width: 237px;
   height: 43px !important;
   border-radius: 20px;
+  text-decoration: none;
+  text-align: center;
 }
 .btn-action{
   width: 590px;
@@ -263,6 +371,12 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
 }
 .text-bg{
   color: $text-bg !important;
+}
+
+.buttons-group {
+  font-size: 11px;
+  line-height: 12px;
+  font-weight: 300;
 }
 
 //=======================

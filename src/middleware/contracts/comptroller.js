@@ -6,10 +6,16 @@ import signer from './utils';
 
 export default class Comptroller {
   constructor(chainId) {
+    this.deployBlock = addresses[chainId].deployBlock;
     this.comptrollerAddress = addresses[chainId].comptroller;
     this.kRBTC = addresses[chainId].kRBTC;
+    this.kSAT = addresses[chainId].kSAT;
+    this.kRIF = addresses[chainId].kRIF;
+    this.kDOC = addresses[chainId].kDOC;
+    this.kUSDT = addresses[chainId].kUSDT;
     this.instance = new ethers.Contract(this.comptrollerAddress, ComptrollerAbi, Vue.web3);
     this.wsInstance = new ethers.Contract(this.comptrollerAddress, ComptrollerAbi, Vue.web3Ws);
+    this.chainId = chainId;
   }
 
   async allMarkets(all = true) {
@@ -23,20 +29,6 @@ export default class Comptroller {
       }
     });
     return marketsCopy.reverse();
-  }
-
-  // Block: 1953603
-  // BlockHash: 0x322587483502ba718dc3ac3085ec85dd1c57c2076d08dc1f3a7fee7197daed3c
-  async getTotalRegisteredAddresses() {
-    const events = await this.wsInstance
-      .queryFilter('MarketEntered', -5000);
-    const accountAddresses = [];
-    console.log(`events length: ${events.length}`);
-    events.forEach((marketEnter) => {
-      const { account } = marketEnter.args;
-      if (accountAddresses.indexOf(account) === -1) accountAddresses.push(account);
-    });
-    return accountAddresses.length;
   }
 
   async getAssetsIn(address) {
@@ -80,6 +72,34 @@ export default class Comptroller {
     return 1 - Math.min(1, 1 / await this.healthRatio(markets, chainId, address));
   }
 
+  async risk(markets, accountAddress, chainId) {
+    return new Promise((resolve, reject) => {
+      let canBorrow = 0;
+      let counter = 0;
+      markets.forEach(async (market) => {
+        await Promise.all([
+          market.underlyingCurrentPrice(chainId),
+          market.currentBalanceOfCTokenInUnderlying(accountAddress),
+        ])
+          .then(async ([price, totalDeposit]) => {
+            if (market.marketAddress === this.kRBTC) canBorrow += (totalDeposit * price) * 0.75;
+            if (market.marketAddress === this.kSAT) canBorrow += (totalDeposit * price) * 0.50;
+            if (market.marketAddress === this.kRIF) canBorrow += (totalDeposit * price) * 0.65;
+            if (market.marketAddress === this.kDOC) canBorrow += (totalDeposit * price) * 0.70;
+            if (market.marketAddress === this.kUSDT) canBorrow += (totalDeposit * price) * 0.75;
+            counter += 1;
+            if (counter === markets.length) {
+              const liquidity = await this.getAccountLiquidity(accountAddress);
+              const result = (((canBorrow - liquidity) / canBorrow) * 100).toFixed(0);
+              console.log('canBorrow', canBorrow);
+              resolve({ canBorrow, result });
+            }
+          })
+          .catch(reject);
+      });
+    });
+  }
+
   async hypotheticalHealthFactor(markets, chainId, address, borrowBalanceInUSD) {
     return 1 - Math.min(1, 1 / await this
       .hypotheticalHealthRatio(markets, chainId, address, borrowBalanceInUSD));
@@ -104,8 +124,13 @@ export default class Comptroller {
           market.getEarnings(accountAddress),
         ])
           .then(([price, totalDepositInUnderlying, interestBalance]) => {
-            totalDepositsByIntereses += totalDepositInUnderlying * price;
-            totalDeposits += (totalDepositInUnderlying - interestBalance) * price;
+            if ((totalDepositInUnderlying * price) <= 1e-5) {
+              totalDepositsByIntereses += 0;
+              totalDeposits += 0;
+            } else {
+              totalDepositsByIntereses += totalDepositInUnderlying * price;
+              totalDeposits += (totalDepositInUnderlying - interestBalance) * price;
+            }
             counter += 1;
             if (counter === markets.length) resolve({ totalDepositsByIntereses, totalDeposits });
           })
@@ -127,13 +152,82 @@ export default class Comptroller {
           market.getDebtInterest(accountAddress),
         ])
           .then(([price, totalBorrowInUnderlying, interestBorrow]) => {
-            totalBorrowsByIntereses += totalBorrowInUnderlying * price;
-            totalBorrows += (totalBorrowInUnderlying - interestBorrow) * price;
+            if ((totalBorrowInUnderlying * price) <= 1e-5) {
+              totalBorrowsByIntereses += 0;
+              totalBorrows += 0;
+            } else {
+              totalBorrowsByIntereses += totalBorrowInUnderlying * price;
+              totalBorrows += (totalBorrowInUnderlying - interestBorrow) * price;
+            }
             counter += 1;
             if (counter === markets.length) resolve({ totalBorrowsByIntereses, totalBorrows });
           })
           .catch(reject);
       });
+    });
+  }
+
+  async getRegisteredAddresses(blocks = null) {
+    let delta;
+    if (blocks) {
+      delta = blocks;
+    } else {
+      const currentBlock = await Vue.web3.getBlockNumber();
+      delta = (this.deployBlock - currentBlock);
+    }
+    const events = await this.wsInstance
+      .queryFilter('MarketEntered', delta);
+    const accountAddresses = [];
+    events.forEach((marketEnter) => {
+      const { account } = marketEnter.args;
+      if (accountAddresses.indexOf(account) === -1) accountAddresses.push(account);
+    });
+    return accountAddresses;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async totalValueLockedInUSD(markets, chainId) {
+    return new Promise((resolve, reject) => {
+      const data = [];
+      let counter = 0;
+      let totalValueLocked = 0;
+      Promise.all(markets
+        .map((market) => Promise.all([
+          market.symbol,
+          market.getTotalSupply(),
+          market.underlyingCurrentPrice(chainId),
+        ])))
+        .then((lockedValues) => lockedValues
+          .forEach(([symbol, totalSupply, underlyingPrice]) => {
+            data.push({ symbol, totalSupply, underlyingPrice });
+            totalValueLocked += (totalSupply * underlyingPrice);
+            counter += 1;
+            if (counter === markets.length) resolve({ data, number: totalValueLocked });
+          }))
+        .catch(reject);
+    });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async totalReservesInUSD(markets, chainId) {
+    return new Promise((resolve, reject) => {
+      const data = [];
+      let counter = 0;
+      let totalReserves = 0;
+      Promise.all(markets
+        .map((market) => Promise.all([
+          market.symbol,
+          market.getReserves(),
+          market.underlyingCurrentPrice(chainId),
+        ])))
+        .then((reservesData) => reservesData
+          .forEach(([symbol, reserves, underlyingPrice]) => {
+            data.push({ symbol, reserves, underlyingPrice });
+            totalReserves += (reserves * underlyingPrice);
+            counter += 1;
+            if (counter === markets.length) resolve({ data, number: totalReserves });
+          }))
+        .catch(reject);
     });
   }
 }

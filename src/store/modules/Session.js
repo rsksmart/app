@@ -13,6 +13,7 @@ const state = {
   markets: [],
   drawer: true,
   showDialogConnect: false,
+  typeConnection: '',
 };
 
 if (window.ethereum) {
@@ -66,6 +67,7 @@ const actions = {
           state.wallet = constants.WALLET_DEFIANT;
           commit(constants.SESSION_SET_WALLET, constants.WALLET_DEFIANT);
         }
+        state.typeConnection = constants.WALLET_CONNECT;
       } else {
         return;
       }
@@ -82,7 +84,7 @@ const actions = {
     }
   },
   [constants.SESSION_GET_CHAIN_ID]: ({ commit }) => {
-    if (state.wallet === constants.WALLET_CONNECT) {
+    if (state.typeConnection === constants.WALLET_CONNECT) {
       commit(constants.SESSION_SET_PROPERTY, { chainId: state.provider.chainId });
       return;
     }
@@ -102,8 +104,10 @@ const actions = {
     }
   },
   [constants.SESSION_DISCONNECT_WALLET]: async ({ commit }) => {
-    if (state.wallet === constants.WALLET_METAMASK
-      || state.wallet === constants.WALLET_DEFIANT) await state.provider.disconnect();
+    if (state.typeConnection === constants.WALLET_CONNECT) {
+      state.typeConnection = '';
+      await state.provider.disconnect();
+    }
     commit(constants.SESSION_SET_PROPERTY, { walletAddress: undefined });
     commit(constants.SESSION_SET_PROPERTY, { account: undefined });
     commit(constants.SESSION_SET_PROPERTY, { wallet: undefined });

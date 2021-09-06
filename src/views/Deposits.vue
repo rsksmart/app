@@ -9,22 +9,11 @@
       </p>
     </div>
     <div class="d-flex justify-center actions-bottons">
-      <v-btn
-        class="btn mr-9"
-        text
-      >
+      <a target="_blank" class="btn btn-secondary" :href="url">
         <span class="b1-main text-primary">
           {{ $t('deposits.btn1') }}
         </span>
-      </v-btn>
-      <v-btn
-        class="btn btn-secondary"
-        text
-      >
-        <span class="b1-main text-primary">
-          {{ $t('deposits.btn2') }}
-        </span>
-      </v-btn>
+      </a>
     </div>
 
     <v-row class="ma-0">
@@ -33,80 +22,50 @@
       </p>
     </v-row>
 
-    <landing :inBorrowMenu="inBorrowMenu" :key="key"/>
-
+    <landing />
   </div>
 </template>
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import Landing from '@/components/home/Landing.vue';
-// import UserHome from '@/components/home/UserHome.vue';
 import * as constants from '@/store/constants';
 
 export default {
   components: {
     Landing,
-    // UserHome
   },
   data() {
     return {
-      markets: [
-        {
-          id: 1,
-          name: 'RBTC',
-          img: 'https://firebasestorage.googleapis.com/v0/b/tropycofinance.appspot.com/o/markets%2FRBTC.svg?alt=media&token=65f6dd30-5bcc-42c1-bbda-7795c64cccdd',
-          percent: '4,1%',
-          description: 'Tasa de interés anual dinámica actual',
-        },
-        {
-          id: 2,
-          name: 'USDT',
-          img: 'https://firebasestorage.googleapis.com/v0/b/tropycofinance.appspot.com/o/markets%2FrUSDT.svg?alt=media&token=3891051f-7e12-42ce-9c9a-d10aba745717',
-          percent: '11,2%',
-          description: 'Tasa de interés anual dinámica actual',
-        },
-        {
-          id: 3,
-          name: 'DOC',
-          img: 'https://firebasestorage.googleapis.com/v0/b/tropycofinance.appspot.com/o/markets%2FDOC.svg?alt=media&token=9e33e1d7-8631-47a6-8b34-02503cc438ae',
-          percent: '10,21%',
-          description: 'Tasa de interés anual dinámica actual',
-        },
-        {
-          id: 4,
-          name: 'RIF',
-          img: 'https://firebasestorage.googleapis.com/v0/b/tropycofinance.appspot.com/o/markets%2FRIF.svg?alt=media&token=f8bb86a4-2fa5-40d1-aec6-5aa402fcb067',
-          percent: '1,4%',
-          description: 'Tasa de interés anual dinámica actual',
-        },
-      ],
-      inBorrowMenu: false,
-      key: 0,
+      constants,
+      url: 'https://www.youtube.com/watch?v=a973Xe2e6tQ',
     };
   },
+  watch: {
+    wallet() {
+      this.tutorial();
+    },
+  },
   computed: {
-    ...mapGetters({
-      isLoggedIn: constants.SESSION_IS_CONNECTED,
-    }),
     ...mapState({
-      routePath: (state) => state.route.path,
+      wallet: (state) => state.Session.wallet,
     }),
-    // currentComponent() {
-    //   return this.isLoggedIn ? 'UserHome' : 'Landing';
-    // },
+  },
+  methods: {
+    tutorial() {
+      if (this.wallet === constants.WALLET_LIQUALITY) {
+        this.url = 'https://www.youtube.com/watch?v=a973Xe2e6tQ';
+      }
+      if (this.wallet === constants.WALLET_METAMASK
+        || this.wallet === constants.WALLET_NIFTY) {
+        this.url = 'https://www.youtube.com/watch?v=K0OL16M7a-I';
+      }
+      if (this.wallet === constants.WALLET_DEFIANT) {
+        this.url = 'https://www.youtube.com/watch?v=RwYjEjLH4E8';
+      }
+    },
   },
   created() {
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', () => {
-        this.key += 1;
-      });
-      window.ethereum.on('chainChanged', () => {
-        this.key += 1;
-      });
-    }
-    if (this.routePath === '/es') {
-      this.$i18n.locale = 'es';
-    }
+    this.tutorial();
   },
 };
 </script>

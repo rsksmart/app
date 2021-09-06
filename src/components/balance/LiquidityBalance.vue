@@ -1,5 +1,5 @@
 <template>
-  <div class="balance-deposit balance-style">
+  <div class="balance-liquidity balance-style">
     <div class="d-flex">
       <div class="tooltip-info">
         <v-tooltip bottom
@@ -8,17 +8,17 @@
             <v-img v-bind="attrs" v-on="on" src="@/assets/icons/info2.svg" contain/>
           </template>
           <span class="p5-feedback text-info">
-            {{$t('balance.tooltip1')}}
+            {{$t('balance.tooltip3')}}
           </span>
         </v-tooltip>
       </div>
-      <img src="@/assets/icons/pig2.svg" alt="Deposit">
+      <img src="@/assets/icons/borrow2.svg" alt="Deposit">
       <div class="ml-5">
         <div class="p1-descriptions mb-2">
-          {{$t('balance.deposit.description1')}}
+          {{$t('balance.liquidity.description1')}}
         </div>
         <div class="p2-reading-values mb-1">
-          {{totalDepositsByIntereses}} USD
+          {{liquidity}} USD
         </div>
         <div class="p3-USD-values">
           {{!totalRbtc ? 0 : totalRbtc}} RBTC<br />
@@ -31,10 +31,10 @@
 import { mapState } from 'vuex';
 
 export default {
-  name: 'DepositsBalance',
+  name: 'LiquidityBalance',
   props: {
-    infoDeposits: {
-      type: Object,
+    liquidityAmount: {
+      type: Number,
       require: true,
     },
     priceRbtc: {
@@ -46,21 +46,11 @@ export default {
     ...mapState({
       chainId: (state) => state.Session.chainId,
     }),
+    liquidity() {
+      return Number(this.liquidityAmount).toFixed(4);
+    },
     totalRbtc() {
-      return (Number(this.totalDepositsByIntereses) / this.priceRbtc).toFixed(6);
-    },
-    totalDeposits() {
-      return Object.entries(this.infoDeposits).length > 0
-        ? this.infoDeposits.totalDeposits.toFixed(2) : 0;
-    },
-    totalDepositsByIntereses() {
-      return Object.entries(this.infoDeposits).length > 0
-        ? this.infoDeposits.totalDepositsByIntereses.toFixed(2) : 0;
-    },
-    totalIntereses() {
-      return Object.entries(this.infoDeposits).length > 0
-        ? (this.infoDeposits.totalDepositsByIntereses - this.infoDeposits.totalDeposits).toFixed(2)
-        : 0;
+      return (Number(this.liquidity) / this.priceRbtc).toFixed(6);
     },
   },
 };

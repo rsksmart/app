@@ -22,7 +22,7 @@
         <dropdown :select="select" :getMarkets="getMarkets" @updateRoute="updateRoute"/>
       </div>
       <div class="content-amunt mb-10">
-        <div class="d-flex amout">
+        <div v-if="tabMenu" class="d-flex amout">
           <div>
             <div class="p1-descriptions">
               {{ tabMenu ? $t('borrow.description2') : $t('pay.description3')}}
@@ -54,11 +54,10 @@
             <div v-if="tabMenu" class="p2-reading-values">{{ info.rate }} %</div>
             <template v-else>
               <div class="p2-reading-values">
-                {{
-                  tokenBalance | formatDecimals
+                {{ !tokenBalance ? 0 : tokenBalance | formatDecimals
                 }} {{ info.underlyingSymbol }}
               </div>
-              <div class="p3-USD-values">{{ tokenPrice | formatPrice }} USD</div>
+              <div class="p3-USD-values">{{ !tokenPrice ? 0 : tokenPrice | formatPrice }} USD</div>
             </template>
           </div>
           <div class="tooltip-info ml-7 mt-1">
@@ -83,7 +82,7 @@
           </div>
           <div class="divider"></div>
           <div class="content-risk">
-            <risk-chart :riskRate="riskValue" :inBalance="false"
+            <risk-chart :riskRate="percentCurrent" :inBalance="false"
               :typeChart="'borrow'"
             />
           </div>
@@ -183,6 +182,8 @@ import * as constants from '@/store/constants';
 import RiskChart from '@/components/users/RiskChart.vue';
 import ConnectWallet from '@/components/dialog/ConnectWallet.vue';
 import Loading from '@/components/modals/Loading.vue';
+// import { addresses } from '@/middleware/contracts/constants';
+
 import {
   Comptroller,
   Firestore,
@@ -199,6 +200,9 @@ export default {
     return {
       counterAction: 0,
       firestore: new Firestore(),
+      canBorrow: 0,
+      percentCurrent: 0,
+      borrowCurrent: 0,
       isProgress: true,
       tabMenu: true,
       sliderStyle: '',
@@ -324,6 +328,7 @@ export default {
       this.riskValue = await this.comptroller
         .hypotheticalHealthFactor(this.markets, this.chainId,
           this.walletAddress, this.borrowValueInUSD) * 100;
+      if (this.amount > 0) this.calculateRisk();
     },
     marketsStore() {
       this.getMarkets = this.marketsStore;
@@ -346,6 +351,7 @@ export default {
       if (!this.account) this.tabMenu = true;
       this.updateMarket();
       this.totalDepositsInUSD();
+      this.getDataRisk();
     },
     tabMenu() {
       this.reset();
@@ -361,79 +367,18 @@ export default {
         this.showModalConnectWallet = true;
         return;
       }
-      this.isLoading = true;
-      this.infoLoading.loading = true;
-      this.infoLoading.wallet = true;
-      this.infoLoading.symbol = this.select.underlyingSymbol;
-      this.counterAction = 1;
-      if (this.tabMenu) {
-        await this.market.borrow(this.account, this.amount)
-          .then((tx) => {
-            this.infoLoading.wallet = false;
-            this.market.wsInstance.on('Borrow', (from, amount) => {
-              if (from === this.walletAddress && Number(this.amount) === amount / 1e18) {
-                if (!this.isLoading) {
-                  this.isLoading = true;
-                }
-                this.infoLoading.loading = false;
-                this.infoLoading.borrow = true;
-                this.infoLoading.amount = amount / 1e18;
-                if (this.counterAction === 1) {
-                  this.firestore.saveUserAction(
-                    this.comptroller.comptrollerAddress,
-                    this.walletAddress,
-                    'Borrow',
-                    amount / 1e18,
-                    this.info.underlyingSymbol,
-                    this.market.marketAddress,
-                    this.info.underlyingPrice,
-                    new Date(),
-                    tx.hash,
-                  );
-                }
-                this.counterAction = 0;
-                setTimeout(() => {
-                  this.getMarket();
-                }, 2000);
-              }
-            });
-          })
-          .catch(console.error);
-      } else {
-        let amountPay = this.amount;
-        if (this.amount === this.info.borrowBalance) amountPay = -1;
-        this.market.repay(this.account, amountPay)
-          .then((tx) => {
-            this.infoLoading.wallet = false;
-            this.market.wsInstance.on('RepayBorrow', (from, _, amount) => {
-              if (from === this.walletAddress) {
-                if (!this.isLoading) {
-                  this.isLoading = true;
-                }
-                this.infoLoading.loading = false;
-                this.infoLoading.borrow = false;
-                this.infoLoading.amount = amount / 1e18;
-                if (this.counterAction === 1) {
-                  this.firestore.saveUserAction(
-                    this.comptroller.comptrollerAddress,
-                    this.walletAddress,
-                    'RepayBorrow',
-                    amount / 1e18,
-                    this.info.underlyingSymbol,
-                    this.market.marketAddress,
-                    this.info.underlyingPrice,
-                    new Date(),
-                    tx.hash,
-                  );
-                }
-                setTimeout(() => {
-                  this.getMarket();
-                }, 2000);
-              }
-            });
-          })
-          .catch(console.error);
-      }
+
+      this.$store.dispatch({
+        type: constants.USER_ACTION,
+        market: this.market,
+        action: this.tabMenu ? constants.USER_ACTION_BORROW : constants.USER_ACTION_REPAY,
+        amount: this.amount,
+        symbol: this.select.underlyingSymbol,
+        price: this.info.underlyingPrice,
+      });
+
+      this.reset();
+
       this.market.wsInstance.on('TokenFailure', (from, to, amount, event) => {
         console.info(`Failure from ${from} Event: ${JSON.stringify(event)}`);
         const { error, detail, info } = event.args;
@@ -475,9 +420,15 @@ export default {
     },
     handleBalance() {
       if (!this.account) return;
-      if (this.tabMenu) this.chartColor();
-      const balance = (this.sliderValue * this.tokenBalance) / 100;
-      this.amount = balance;
+      if (this.tabMenu) {
+        this.chartColor();
+      }
+      if (this.sliderValue === 100) {
+        this.amount = this.tabMenu ? this.tokenBalance : this.info.borrowBalance;
+      } else {
+        const balance = (this.sliderValue * this.tokenBalance) / 100;
+        this.amount = balance;
+      }
       const tempData = [...this.chartData];
       tempData[2][1] = this.borrowValueInUSD;
       this.chartData = tempData;
@@ -522,7 +473,6 @@ export default {
           .totalDepositsByInteresesInUSD(this.markets, this.walletAddress, this.chainId);
 
         tempData[1][1] = collateral.totalDepositsByIntereses;
-        this.liquidity = await this.comptroller.getAccountLiquidity(this.walletAddress);
         this.chartData = tempData;
 
         // we get the interest to pay
@@ -554,6 +504,8 @@ export default {
       this.chartData = tempData;
       this.riskValue = 100;
       this.sliderStyle = '';
+      this.borrowCurrent = 0;
+      this.percentCurrent = 0;
     },
     closeDialog() {
       if (this.infoLoading.loading === false) {
@@ -567,6 +519,46 @@ export default {
         this.tabMenu = menu;
       }
     },
+    calculateRisk() {
+      // let factor = 0;
+      // const {
+      //   kSAT,
+      //   kRBTC,
+      //   kDOC,
+      //   kRIF,
+      //   kUSDT,
+      // } = addresses[this.chainId];
+      // const { marketAddress } = this.market;
+      // console.log('marketAddress', marketAddress);
+      // console.log('kUSDT', kUSDT);
+      // console.log(marketAddress === kUSDT);
+      // console.log(this.borrowValueInUSD * 0.75);
+      // if (marketAddress === kSAT) factor = this.borrowValueInUSD * 0.50;
+      // if (marketAddress === kRBTC) factor = this.borrowValueInUSD * 0.75;
+      // if (marketAddress === kDOC) factor = this.borrowValueInUSD * 0.70;
+      // if (marketAddress === kRIF) factor = this.borrowValueInUSD * 0.65;
+      // if (marketAddress === kUSDT) factor = this.borrowValueInUSD;
+      // console.log('factor', factor);
+      // console.log('liquidity', this.liquidity);
+      this.borrowCurrent = (this.canBorrow - this.liquidity) + this.borrowValueInUSD;
+      const percent = ((this.borrowCurrent / this.canBorrow) * 100).toFixed(0);
+      this.percentCurrent = Number(percent);
+      // console.log('value', this.borrowCurrent);
+      // console.log('percent', percent);
+      // console.log('percentCurrent', this.percentCurrent);
+    },
+    async getDataRisk() {
+      if (!this.walletAddress) return;
+      const risk = await this.comptroller
+        .risk(this.markets, this.walletAddress, this.chainId);
+
+      this.liquidity = await this.comptroller.getAccountLiquidity(this.walletAddress);
+
+      const { canBorrow, result } = risk;
+      this.canBorrow = canBorrow;
+      this.percentCurrent = Number(result);
+      this.calculateRisk();
+    },
   },
   created() {
     this.ofBalance();
@@ -574,6 +566,7 @@ export default {
     this.getMarket();
     this.getMarketsStore(this.markets);
     this.totalDepositsInUSD();
+    this.getDataRisk();
   },
 };
 </script>

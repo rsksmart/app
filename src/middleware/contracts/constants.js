@@ -23,7 +23,8 @@ export const addresses = {
     Rif: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   },
   31: {
-    multiSigWallet: '',
+    deployBlock: 2000000,
+    multiSigWallet: '0x6a5d70e209202edd346d3b8d4e2a6fd3164e45bc',
     priceOracleProxy: '0x9422e0a380e9f077767044f43dd16c8d7d3f4b29',
     RIF: '0x19f64674d8a5b4e652319f5e239efd3bc969a1fe',
     DOC: '0xcb46c0ddc60d18efeb0e586c17af6ea36452dae0',
@@ -50,7 +51,7 @@ export const addresses = {
     kUSDT: '0xde2dc0aea8fc8ce567f5f48344ed44b89d6186b7',
     kRBTC: '0x7967ca03ddeb1405730563187b0706ad36b69b60',
     kSAT: '0xd1edae988e9afaf6da1b44a4d0c40c0ea03ce9c6',
-    tropykusLens: '0x0a9ff3df618aa6c3bd727efe491e5f17faaa82bc',
+    tropykusLens: '0x6bf00f6b4e06cda667cebfa1a94942d9eb739abc',
     whitelist: '0x60e7bbd1c4c6c77d829038137d1a306d5c21aeb1',
     sovrynSwapNetwork: '0x61172b53423e205a399640e5283e51fe60ec2256',
     rbtcWrapperProxy: '0x2c468f9c82c20c37cd1606cf3a09702f94910691',
