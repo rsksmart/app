@@ -90,29 +90,43 @@
       </div>
 
       <div class="content-action">
-        <v-divider class="divider mb-4 mt-6"></v-divider>
+        <div class="mt-1">
 
-        <div class="p1-descriptions mb-3 text-info">
+        <div class="p1-descriptions">{{$t('borrow.description7')}}</div>
+        <div class="line-risk">
+          <div class="actual-risk" :style="{ width: percent + '%'}"></div>
+        </div>
+        <div class="p6-reading-values text-uppercase">{{riskDescription}}</div>
+        </div>
+
+        <!-- <v-divider class="divider mb-4 mt-6"></v-divider> -->
+
+        <div class="p1-descriptions mb-3 text-info mt-6">
           {{ tabMenu ? $t('borrow.description4') : $t('pay.description2')}}
         </div>
         <div class="input-box primary-bg ma-0"
           :class="!activeButton && amount > 0 ? 'alert' : ''"
         >
           <div class="d-flex">
-            <v-text-field
-              type="number"
-              v-model="amount"
-              :rules="[rules.liquidity, rules.minBalance, rules.cash,
-              rules.borrowBalance, rules.payBorrow]"
-              class="h1-title text-info pa-0 ma-0"
-              background-color="#CFE7DA"
-              color="#47B25F"
-              :placeholder="'0 ' + (select.underlyingSymbol ? select.underlyingSymbol : '')"
-              filled
-              rounded
-              dense
-              @input="handleAmount"
-            ></v-text-field>
+            <div>
+              <v-text-field
+                type="number"
+                v-model="amount"
+                :rules="[rules.liquidity, rules.minBalance, rules.cash,
+                rules.borrowBalance, rules.payBorrow]"
+                class="h1-title text-info pa-0 ma-0"
+                background-color="#CFE7DA"
+                color="#47B25F"
+                :placeholder="'0 ' + (select.underlyingSymbol ? select.underlyingSymbol : '')"
+                filled
+                rounded
+                dense
+                @input="handleAmount"
+              ></v-text-field>
+              <div class="p3-USD-values amount-usd">
+                {{ !amountValueInUSD ? 0 : amountValueInUSD }} USD
+              </div>
+            </div>
             <v-btn  height="40" text @click="setMaxAmount">
               <span class="text-primary">MÁX</span>
             </v-btn>
@@ -201,6 +215,7 @@ export default {
       counterAction: 0,
       firestore: new Firestore(),
       canBorrow: 0,
+      percent: 0,
       percentCurrent: 0,
       borrowCurrent: 0,
       isProgress: true,
@@ -292,6 +307,10 @@ export default {
       marketStore: (state) => state.Market.market,
       isProgressStore: (state) => state.Market.isProgress,
     }),
+    amountValueInUSD() {
+      return this.info.underlyingPrice ? (this.amount * this.info.underlyingPrice).toFixed(4)
+        : 0.0000;
+    },
     borrowValueInUSD() {
       return this.amount * this.info.underlyingPrice;
     },
@@ -316,6 +335,14 @@ export default {
         .rules.borrowBalance() !== 'string' && typeof this
         .rules.cash() !== 'string';
     },
+    riskDescription() {
+      if (this.percent === 0) return this.$t('balance.risk.titles.no-risk');
+      if (this.percent > 0 && this.percent < 40) return this.$t('balance.risk.titles.low-risk');
+      if (this.percent >= 40 && this.percent <= 60) return this.$t('balance.risk.titles.medium-risk');
+      if (this.percent > 60 && this.percent < 100) return this.$t('balance.risk.titles.high-risk');
+      if (this.percent === 100) return this.$t('balance.risk.titles.liquidated');
+      return this.$t('balance.risk.titles.no-risk');
+    },
   },
   watch: {
     isProgressStore() {
@@ -328,7 +355,7 @@ export default {
       this.riskValue = await this.comptroller
         .hypotheticalHealthFactor(this.markets, this.chainId,
           this.walletAddress, this.borrowValueInUSD) * 100;
-      if (this.amount > 0) this.calculateRisk();
+      if (this.account) this.calculateRisk();
     },
     marketsStore() {
       this.getMarkets = this.marketsStore;
@@ -343,6 +370,7 @@ export default {
       this.getMarket();
       this.totalDepositsInUSD();
       this.reset();
+      this.getDataRisk();
     },
     marketStore() {
       this.market = this.marketStore;
@@ -378,15 +406,6 @@ export default {
       });
 
       this.reset();
-
-      this.market.wsInstance.on('TokenFailure', (from, to, amount, event) => {
-        console.info(`Failure from ${from} Event: ${JSON.stringify(event)}`);
-        const { error, detail, info } = event.args;
-        console.log(`Error: ${error}, detail: ${detail}, info: ${info}`);
-        if (this.walletAddress === from) {
-          console.log('error');
-        }
-      });
     },
     updateRoute(marketAddress) {
       if (this.$route.params.id !== marketAddress) {
@@ -505,7 +524,7 @@ export default {
       this.riskValue = 100;
       this.sliderStyle = '';
       this.borrowCurrent = 0;
-      this.percentCurrent = 0;
+      // this.percentCurrent = 0;
     },
     closeDialog() {
       if (this.infoLoading.loading === false) {
@@ -520,32 +539,9 @@ export default {
       }
     },
     calculateRisk() {
-      // let factor = 0;
-      // const {
-      //   kSAT,
-      //   kRBTC,
-      //   kDOC,
-      //   kRIF,
-      //   kUSDT,
-      // } = addresses[this.chainId];
-      // const { marketAddress } = this.market;
-      // console.log('marketAddress', marketAddress);
-      // console.log('kUSDT', kUSDT);
-      // console.log(marketAddress === kUSDT);
-      // console.log(this.borrowValueInUSD * 0.75);
-      // if (marketAddress === kSAT) factor = this.borrowValueInUSD * 0.50;
-      // if (marketAddress === kRBTC) factor = this.borrowValueInUSD * 0.75;
-      // if (marketAddress === kDOC) factor = this.borrowValueInUSD * 0.70;
-      // if (marketAddress === kRIF) factor = this.borrowValueInUSD * 0.65;
-      // if (marketAddress === kUSDT) factor = this.borrowValueInUSD;
-      // console.log('factor', factor);
-      // console.log('liquidity', this.liquidity);
       this.borrowCurrent = (this.canBorrow - this.liquidity) + this.borrowValueInUSD;
       const percent = ((this.borrowCurrent / this.canBorrow) * 100).toFixed(0);
       this.percentCurrent = Number(percent);
-      // console.log('value', this.borrowCurrent);
-      // console.log('percent', percent);
-      // console.log('percentCurrent', this.percentCurrent);
     },
     async getDataRisk() {
       if (!this.walletAddress) return;
@@ -556,6 +552,7 @@ export default {
 
       const { canBorrow, result } = risk;
       this.canBorrow = canBorrow;
+      this.percent = !result ? 0 : result;
       this.percentCurrent = Number(result);
       this.calculateRisk();
     },

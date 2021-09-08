@@ -291,6 +291,41 @@
   }
 }
 
+.d-swap {
+  width: 393px;
+  height: 462px;
+}
+.dialog-swap{
+  width: 393px;
+  height: 462px;
+  background-image: url('../assets/dialog/background.svg');
+  background-size: cover;
+  .content-swap{
+    width: 249px;
+  }
+  .img-change{
+    width: 24px;
+    height: 24px;
+  }
+  .btn{
+    width: 249px;
+  }
+  .resumen{
+    width: 240px;
+  }
+  .loading{
+    .text-description{
+      width: 158px;
+    }
+  }
+  .text-description{
+    width: 181px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 16px;
+  }
+}
+
 @include desktop(){
   .d-loading{
     width: 414px !important;

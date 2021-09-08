@@ -114,18 +114,10 @@
         </div>
       </div>
     </div>
-    <!-- <v-btn text class="btn-action"
-            :class="'secondary-bg'" @click="swapTokens">
-      <span class="white--text">
-        {{
-          $t('swaps.btn1')
-        }}
-      </span>
-    </v-btn> -->
     <v-btn text class="btn-action"
         :disabled="!activeButton"
         :class="activeButton ? 'primary-color' : 'secondary-bg'"
-        @click="swapTokens"
+        @click="openSwapDialog"
       >
         <span class="white--text">
           {{
@@ -134,6 +126,15 @@
         </span>
       </v-btn>
     </div>
+
+    <template v-if="swapDialog">
+      <swap-loading :show="swapDialog" :data="dataSwapDialog" @closeDialog="closeSwapDialog"
+        @swapTokens="swapTokens"/>
+    </template>
+
+    <template v-if="dialogWallet">
+      <connect-wallet :showModal="dialogWallet" @closed="closeSwapDialog" />
+    </template>
   </v-card>
 </template>
 
@@ -145,14 +146,20 @@ import {
   SovrynSwap,
 } from '@/middleware';
 import { addresses } from '@/middleware/contracts/constants';
+import SwapLoading from '@/components/dialog/SwapLoading.vue';
+import ConnectWallet from '@/components/dialog/ConnectWallet.vue';
 
 export default {
   name: 'SwapPanel',
   components: {
     Dropdown,
+    SwapLoading,
+    ConnectWallet,
   },
   data() {
     return {
+      dialogWallet: false,
+      swapDialog: false,
       amount: null,
       amountToReceive: null,
       sovrynSwap: null,
@@ -170,6 +177,7 @@ export default {
       info: null,
       sourceTokenBalance: 0,
       destTokenBalance: 0,
+      dataSwapDialog: {},
     };
   },
   computed: {
@@ -183,9 +191,11 @@ export default {
       destInfoStore: (state) => state.Market.dest_info,
       selectStore: (state) => state.Market.select,
       destSelectStore: (state) => state.Market.dest_select,
-      marketStore: (state) => state.Market.market,
-      isProgressStore: (state) => state.Market.isProgress,
+      swapDialogStore: (state) => state.Users.swapDialog,
     }),
+    activeButton() {
+      return this.amount > 0;
+    },
   },
   watch: {
     walletAddress() {
@@ -224,22 +234,15 @@ export default {
       }
     },
     price() {
-      if (this.price.isNan()) this.price = 0;
+      if (!Number(this.price)) this.price = 0;
     },
-    activeButton() {
-      return this.amount > 0;
-      // && typeof this
-      // .rules.liquidity() !== 'string' && typeof this
-      // .rules.minBalance() !== 'string' && typeof this
-      // .rules.payBorrow() !== 'string' && typeof this
-      // .rules.borrowBalance() !== 'string' && typeof this
-      // .rules.cash() !== 'string';
+    swapDialogStore() {
+      this.swapDialog = this.swapDialogStore;
     },
   },
   methods: {
     ...mapActions({
       getMarketsStore: constants.MARKET_GET_MARKETSINFO,
-      getIsProgressStore: constants.MARKET_ISPROGRESS,
     }),
     async updateSelect(marketAddress) {
       this.selectSourceToken = marketAddress;
@@ -290,25 +293,56 @@ export default {
 
       this.price = (!this.amount) ? 0 : (this.amountToReceive / this.amount);
     },
+    openSwapDialog() {
+      if (!this.account) {
+        this.dialogWallet = true;
+        return;
+      }
+      const dataSwapDialog = {
+        amount: this.amount,
+        minReturn: this.minReturn,
+        amountToReceive: this.amountToReceive,
+        select: this.select,
+        selectI: this.select_I,
+        price: this.price,
+      };
+      this.dataSwapDialog = dataSwapDialog;
+      this.$store.dispatch({
+        type: constants.USER_ACTION_SWAP_DIALOG,
+        data: true,
+      });
+    },
+    closeSwapDialog() {
+      this.$store.dispatch({
+        type: constants.USER_ACTION_SWAP_DIALOG,
+        data: false,
+      });
+      this.dialogWallet = false;
+      this.dataSwapDialog = {};
+    },
     async swapTokens() {
       if (this.sourceToken && this.destToken) {
         const minReturn = (Number(this.targetAmount) - (Number(this.targetAmount) * 0.01))
           .toFixed(18);
-        console.log(minReturn);
-        if (this.sourceToken === addresses[this.chainId].wRBTC) {
-          console.log('From RBTC');
-          await this.sovrynSwap
-            .convertFromRBTC(this.account, this.conversionPath, this.amount, minReturn);
-        } else if (this.destToken === addresses[this.chainId].wRBTC) {
-          console.log('To RBTC');
-          await this.sovrynSwap
-            .convertToRBTC(this.account, this.conversionPath, this.amount, minReturn);
-        } else {
-          console.log('From and to any other token');
-          await this.sovrynSwap
-            .convertByPath(this.account, this.walletAddress,
-              this.conversionPath, this.amount, minReturn);
-        }
+
+        const data = {
+          sourceToken: this.sourceToken,
+          destToken: this.destToken,
+          amount: this.amount,
+          minReturn,
+          amountToReceive: this.amountToReceive,
+          conversionPath: this.conversionPath,
+          sovrynSwap: this.sovrynSwap,
+          select: this.select,
+          selectI: this.select_I,
+        };
+
+        this.$store.dispatch({
+          type: constants.USER_ACTION_SWAP,
+          ...data,
+        });
+
+        this.reset();
       }
     },
     setMaxAmount() {
@@ -333,6 +367,11 @@ export default {
       aux = this.amount;
       this.amount = this.amountToReceive;
       this.amountToReceive = aux;
+    },
+    reset() {
+      this.amount = null;
+      this.amountToReceive = null;
+      this.minReturn = 0;
     },
   },
   async created() {

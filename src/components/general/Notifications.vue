@@ -14,7 +14,7 @@
           <div class="p1-descriptions text-detail">
             {{$t('notify.description5')}}
           </div>
-          <a target="_blank" :href="`https://explorer.testnet.rsk.co/tx/${info.hash}`">
+          <a target="_blank" :href="`${explorer}/${info.hash}`">
             <img class="link ml-5" src="@/assets/icons/link.svg" />
           </a>
         </div>
@@ -23,7 +23,7 @@
   </v-card>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import * as constants from '@/store/constants';
 
 export default {
@@ -47,6 +47,21 @@ export default {
       active: false,
     };
   },
+  computed: {
+    ...mapState({
+      chainId: (state) => state.Session.chainId,
+    }),
+    explorer() {
+      switch (this.chainId) {
+        case 30:
+          return 'https://explorer.rsk.co/tx';
+        case 31:
+          return 'https://explorer.testnet.rsk.co/tx';
+        default:
+          return '';
+      }
+    },
+  },
   methods: {
     ...mapActions({
       actionNotification: constants.USER_ACTION_NOTIFICATIONS,
@@ -61,6 +76,7 @@ export default {
       if (action === 'Mint') return this.$t('notify.description1');
       if (action === 'Redeem') return this.$t('notify.description2');
       if (action === 'Borrow') return this.$t('notify.description3');
+      if (action === 'Exchange') return this.$t('notify.description6');
       return this.$t('notify.description4');
     },
   },

@@ -56,11 +56,13 @@
             <div class="primary-paragraph mb-1">
               {{ $t('feedback.sendAComment.walletField') }}
             </div>
-            <buttons-group v-model="wallet" :buttons="$t('feedback.sendAComment.walletOptions')" class="buttons-group mb-4" />
+            <buttons-group v-model="wallet"
+              :buttons="$t('feedback.sendAComment.walletOptions')" class="buttons-group mb-4" />
             <div class="primary-paragraph mb-1">
               {{ $t('feedback.sendAComment.sectionField') }}
             </div>
-            <buttons-group v-model="section" :buttons="$t('feedback.sendAComment.sectionOptions')" class="buttons-group mb-4" />
+            <buttons-group v-model="section"
+              :buttons="$t('feedback.sendAComment.sectionOptions')" class="buttons-group mb-4" />
             <div class="primary-paragraph mb-1">
               {{ $t('feedback.sendAComment.problemField') }}*
             </div>

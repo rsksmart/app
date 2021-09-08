@@ -160,15 +160,19 @@ input[type=number]::-moz-placeholder { /* Firefox 19+ */ color: #63A47B ; }
 input[type=number]:-ms-input-placeholder { color: #63A47B ; }
 .input-box{
   box-sizing: border-box;
-  height: 48px;
+  height: 61px;
   width: 467px;
   border-radius: 5px;
-  // .v-input__slot{
-    // height: 45px;
-  // }
+  position: relative;
+
+  .amount-usd{
+    position: absolute;
+    bottom: 8px;
+    margin-left: 29px;
+  }
   .v-messages__message{
     display: none;
-    margin-top: 8px;
+    margin-top: 21px;
     color: $third-color !important;
   }
   button{
@@ -249,16 +253,33 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
     width: 186px;
     height: 62px;
   }
+  .swap{
+    width: 89px !important;
+    // height: 30px !important;
+    border: 0.8px solid #47B25F;
+    box-sizing: border-box;
+    border-radius: 5px;
+    .v-list{
+      padding: 0 !important;
+    }
+    .v-list-item {
+      padding: 0 !important;
+    }
+    img{
+      width: 15px;
+      height: 15px;
+    }
+    .h3-sections-heading{
+      font-size: 11px !important;
+      line-height: 13px !important;
+    }
+  }
   .active{
     background-color: #CDE9DA;
   }
   img{
     width: 30px;
     height: 30px;
-  }
-
-  &.swap{
-    width: 137px !important;
   }
 }
 //metrics select box
@@ -493,7 +514,7 @@ input[type=number]:-ms-input-placeholder { color: #63A47B ; }
   }
   .input-box{
     width: 335px;
-    height: 45px;
+    // height: 45px;
     border-radius: 5px;
     // .v-input__slot{
     //   height: 45px;

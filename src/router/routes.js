@@ -63,4 +63,9 @@ export default [
     name: 'InternalMetrics',
     component: () => import(/* webpackChunkName: "Metrics" */ '@/views/InternalMetrics.vue'),
   },
+  {
+    path: '/trade-swaps',
+    name: 'Exchanges',
+    component: () => import(/* webpackChunkName: "LednToLiquality" */ '@/views/TradeSwaps.vue'),
+  },
 ];

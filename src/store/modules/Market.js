@@ -67,12 +67,8 @@ const actions = {
     const {
       walletAddress, account, page,
     } = data;
-<<<<<<< HEAD
     const market = (data.isDestSwapMarket) ? state.dest_market : state.market;
 
-=======
-    const { market } = state;
->>>>>>> test2
     info.underlyingSymbol = await market.underlyingAssetSymbol();
     info.rate = page === constants.ROUTE_NAMES.DEPOSITS
       ? await market.supplyRateAPY()
@@ -96,7 +92,6 @@ const actions = {
     }
 
     if (data.isDestSwapMarket) {
-      console.log('Hit MARKET_UPDATE_MARKET');
       commit(constants.MARKET_UPDATE_DEST_MARKET, info);
       commit(constants.MARKET_ISPROGRESS, false);
     } else {
@@ -118,7 +113,6 @@ const actions = {
       .then((response) => response.data().imageURL);
 
     if (market.isDestSwapMarket) {
-      console.log('Hit MARKET_UPDATE_SELECT');
       commit(constants.MARKET_UPDATE_DEST_SELECT, select);
     } else {
       commit(constants.MARKET_UPDATE_SELECT, select);
@@ -134,7 +128,6 @@ const actions = {
       : new CToken(marketAddress, state.chainId);
 
     if (data.isDestSwapMarket) {
-      console.log('Hit MARKET_GET_MARKET');
       market.isDestSwapMarket = true;
       commit(constants.MARKET_GET_DEST_MARKET, market);
     } else {

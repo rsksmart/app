@@ -17,10 +17,10 @@
         </v-icon>
       </div>
     </template>
-    <v-list>
+    <v-list :class="swap ? 'swap': ''">
       <v-list-item
         v-for="(market, index) in infoMarkets" :key="index" class="select-menu-item"
-        :class="market.symbol === select.symbol ? 'active' : ''"
+        :class="[market.symbol === select.symbol && !swap ? 'active' : '']"
         @click="updateRoute(market)"
       >
         <div class="list-item">
@@ -65,6 +65,7 @@ export default {
       constants,
       infoMarkets: [],
       lending: false,
+      swap: false,
     };
   },
   computed: {
@@ -111,9 +112,17 @@ export default {
     updateRoute(market) {
       this.$emit('updateRoute', market.marketAddress);
     },
+    getRouterSwap() {
+      if (this.$route.name === constants.ROUTE_NAMES.EXCHANGES) {
+        this.swap = true;
+      } else {
+        this.swap = false;
+      }
+    },
   },
   created() {
     this.updateMarkets();
+    this.getRouterSwap();
   },
 };
 </script>

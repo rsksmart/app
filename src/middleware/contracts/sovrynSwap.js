@@ -38,7 +38,7 @@ export default class SovrynSwap {
   // Swaps RBTC to any other token
   async convertFromRBTC(account, conversionPath, amount, minReturn) {
     const accountSigner = signer(account);
-    await this.rbtcWrapperProxy.connect(accountSigner)
+    return this.rbtcWrapperProxy.connect(accountSigner)
       .convertByPath(conversionPath, ethers.utils.parseEther(amount),
         ethers.utils.parseEther(minReturn), {
           value: ethers.utils.parseEther(amount),
@@ -53,7 +53,7 @@ export default class SovrynSwap {
       ERC20TokenAbi, Vue.web3);
     await ERC20Token.connect(accountSigner).approve(this.rbtcWrapperProxy.address,
       ethers.utils.parseEther(amount));
-    await this.rbtcWrapperProxy.connect(accountSigner)
+    return this.rbtcWrapperProxy.connect(accountSigner)
       .convertByPath(conversionPath, ethers.utils.parseEther(amount),
         ethers.utils.parseEther(minReturn), { gasLimit: this.gasLimit });
   }
@@ -67,7 +67,7 @@ export default class SovrynSwap {
       ERC20TokenAbi, Vue.web3);
     await ERC20Token.connect(accountSigner).approve(this.sovrynSwapNetwork.address,
       ethers.utils.parseEther(amount));
-    await this.sovrynSwapNetwork.connect(accountSigner)
+    return this.sovrynSwapNetwork.connect(accountSigner)
       .convertByPath(conversionPath, ethers.utils.parseEther(amount),
         ethers.utils.parseEther(minReturn), beneficiary,
         '0x0000000000000000000000000000000000000000', 0, { gasLimit: this.gasLimit });

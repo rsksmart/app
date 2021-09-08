@@ -63,53 +63,56 @@
 
       <!-- activity -->
       <template v-if="tabMenu === 'activity' && userActivity.length > 0">
-        <div class="d-flex justify-space-between activity mt-8"
-          v-for="activity in userActivity" :key="activity.timestamp.seconds">
-          <div class="d-flex">
-            <img :src="activity.img">
-            <div class="h2-heading">
-              <div class="">{{activity.market}}</div>
-              <div class="p1-descriptions">
-                {{ textMicroSavings(activity.marketAddress, activity.event) }}
-              </div>
-            </div>
-          </div>
-          <div class="p7-graphics">
-            {{$t('balance.table.activity.description1')}} <br />
-            <div class="p6-reading-values">
-              {{eventType(activity.event)}}
-            </div>
-          </div>
-          <div class="p7-graphics">
-            {{$t('balance.table.activity.description2')}} <br />
-            <div class="p6-reading-values">
-              {{activity.amount | formatDecimals(activity.market)}}
-              <span class="">{{activity.market}}</span>
-            </div>
-            <div class="p3-USD-value">
-              {{activity.priceAt * activity.amount | formatPrice(activity.market)}}
-            </div>
-          </div>
-          <div class="p7-graphics">
-            {{$t('balance.table.activity.description3')}} <br />
-            <div class="p6-reading-values">
-              {{ getDate(activity.timestamp.seconds) }}
-            </div>
-          </div>
-          <div class="p7-graphics">
-            {{$t('balance.table.activity.description4')}} <br />
+        <template v-for="activity in userActivity" >
+          <div v-if="activity.event !== 'Exchange'"
+            class="d-flex justify-space-between activity mt-8"
+            :key="activity.timestamp.seconds">
             <div class="d-flex">
-              <div class="p6-reading-values">
-                {{activity.txHash.substring(0, 8)}}...{{activity.txHash.substring(64, 66)}}
+              <img :src="activity.img">
+              <div class="h2-heading">
+                <div class="">{{activity.market}}</div>
+                <div class="p1-descriptions">
+                  {{ textMicroSavings(activity.marketAddress, activity.event) }}
+                </div>
               </div>
-              <img v-if="tooltip && activity.timestamp.seconds === timeHash"
-                class="ml-7 copie" src="@/assets/icons/copied.svg">
-              <img v-else
-                @click="copyhash(activity.txHash, activity.timestamp.seconds)"  class="ml-7 copie"
-                src="@/assets/icons/copie.svg">
+            </div>
+            <div class="p7-graphics">
+              {{$t('balance.table.activity.description1')}} <br />
+              <div class="p6-reading-values">
+                {{eventType(activity.event)}}
+              </div>
+            </div>
+            <div class="p7-graphics">
+              {{$t('balance.table.activity.description2')}} <br />
+              <div class="p6-reading-values">
+                {{activity.amount | formatDecimals(activity.market)}}
+                <span class="">{{activity.market}}</span>
+              </div>
+              <div class="p3-USD-value">
+                {{activity.priceAt * activity.amount | formatPrice(activity.market)}}
+              </div>
+            </div>
+            <div class="p7-graphics">
+              {{$t('balance.table.activity.description3')}} <br />
+              <div class="p6-reading-values">
+                {{ getDate(activity.timestamp.seconds) }}
+              </div>
+            </div>
+            <div class="p7-graphics">
+              {{$t('balance.table.activity.description4')}} <br />
+              <div class="d-flex">
+                <div class="p6-reading-values">
+                  {{activity.txHash.substring(0, 8)}}...{{activity.txHash.substring(64, 66)}}
+                </div>
+                <img v-if="tooltip && activity.timestamp.seconds === timeHash"
+                  class="ml-7 copie" src="@/assets/icons/copied.svg">
+                <img v-else
+                  @click="copyhash(activity.txHash, activity.timestamp.seconds)"  class="ml-7 copie"
+                  src="@/assets/icons/copie.svg">
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </template>
 
       <template v-for="(market, i) in getMarkets" >
@@ -360,6 +363,7 @@ export default {
       if (type === 'Mint') return this.$t('balance.events.mint');
       if (type === 'Redeem') return this.$t('balance.events.redeem');
       if (type === 'Borrow') return this.$t('balance.events.borrow');
+      if (type === 'Exchange') return this.$t('balance.events.exchange');
       return this.$t('balance.events.repayBorrow');
     },
     getDate(timestamp) {

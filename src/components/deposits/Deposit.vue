@@ -105,20 +105,25 @@
           :class="!activeButton && amount > 0 ? 'alert' : ''"
         >
           <div class="d-flex">
-            <v-text-field
-              type="number"
-              v-model="amount"
-              :rules="[rules.leverage, rules.minBalance, rules.collateral, rules.minkRBTC,
-              rules.withoutBalance, rules.supplyBalance, rules.typeMarket]"
-              class="h1-title text-info pa-0 ma-0"
-              background-color="#CFE7DA"
-              color="#47B25F"
-              :placeholder="'0 ' + (select.underlyingSymbol ? select.underlyingSymbol : '')"
-              filled
-              rounded
-              dense
-              @input="handleAmount"
-            ></v-text-field>
+            <div>
+              <v-text-field
+                type="number"
+                v-model="amount"
+                :rules="[rules.leverage, rules.minBalance, rules.collateral, rules.minkRBTC,
+                rules.withoutBalance, rules.supplyBalance, rules.typeMarket]"
+                class="h1-title text-info pa-0 ma-0"
+                background-color="#CFE7DA"
+                color="#47B25F"
+                :placeholder="'0 ' + (select.underlyingSymbol ? select.underlyingSymbol : '')"
+                filled
+                rounded
+                dense
+                @input="handleAmount"
+              ></v-text-field>
+              <div class="p3-USD-values amount-usd">
+                {{ !amountValueInUSD ? 0 : amountValueInUSD }} USD
+              </div>
+            </div>
             <v-btn @click="setMaxAmount" height="40" text>
               <span class="text-primary">MÁX</span>
             </v-btn>
@@ -306,6 +311,10 @@ export default {
       selectStore: (state) => state.Market.select,
       marketStore: (state) => state.Market.market,
     }),
+    amountValueInUSD() {
+      return this.info.underlyingPrice ? (this.amount * this.info.underlyingPrice).toFixed(4)
+        : 0.0000;
+    },
     tokenBalanceUsd() {
       return this.tabMenu
         ? this.info.underlyingBalance * this.info.price

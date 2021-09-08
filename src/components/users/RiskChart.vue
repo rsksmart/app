@@ -83,17 +83,23 @@ export default {
       if (this.riskRate >= 40 && this.riskRate <= 60) return SeriousFace;
       if (this.riskRate > 60 && this.riskRate <= 100) return SurpisedFace;
       if (this.riskRate === 0) return HappyFace;
-      return HappyFace;
+      // return HappyFace;
+      if (this.percent === 0) return this.$t('balance.risk.titles.no-risk');
+      if (this.percent > 0 && this.percent < 40) return this.$t('balance.risk.titles.low-risk');
+      if (this.percent >= 40 && this.percent <= 60) return this.$t('balance.risk.titles.medium-risk');
+      if (this.percent > 60 && this.percent < 100) return this.$t('balance.risk.titles.high-risk');
+      if (this.percent === 100) return this.$t('balance.risk.titles.liquidated');
+      return this.$t('balance.risk.titles.no-risk');
     },
     riskTitle() {
       if (this.riskRate === 0) return this.riskChart.title[this.typeChart].noRisk;
       if (this.riskRate > 60 && this.riskRate <= 100) {
         return this.riskChart.title[this.typeChart].highRisk;
       }
-      if (this.riskRate > 40 && this.riskRate <= 60) {
+      if (this.riskRate >= 40 && this.riskRate <= 60) {
         return this.riskChart.title[this.typeChart].mediumRisk;
       }
-      if (this.riskRate > 0 && this.riskRate <= 40) {
+      if (this.riskRate > 0 && this.riskRate < 40) {
         return this.riskChart.title[this.typeChart].lowRisk;
       }
       return this.riskChart.title[this.typeChart].other;
@@ -102,10 +108,10 @@ export default {
       if (this.riskRate > 60 && this.riskRate <= 100) {
         return this.riskChart.subtitle[this.typeChart].highRisk;
       }
-      if (this.riskRate > 40 && this.riskRate <= 60) {
+      if (this.riskRate >= 40 && this.riskRate <= 60) {
         return this.riskChart.subtitle[this.typeChart].mediumRisk;
       }
-      if (this.riskRate >= 0 && this.riskRate <= 40) {
+      if (this.riskRate > 0 && this.riskRate < 40) {
         return this.riskChart.subtitle[this.typeChart].lowRisk;
       }
       return this.riskChart.subtitle[this.typeChart].other;

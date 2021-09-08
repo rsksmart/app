@@ -1,8 +1,10 @@
 import * as constants from '@/store/constants';
+import { addresses } from '@/middleware/contracts/constants';
 import store from '@/store';
 import {
   Comptroller,
   Firestore,
+  SovrynSwap,
 } from '@/middleware';
 
 const state = {
@@ -19,10 +21,22 @@ const state = {
     success: null,
     firstTx: false,
   },
+  swapDialog: false,
+  swapInfo: {
+    type: '',
+    amount: '',
+    symbol: '',
+    wallet: true,
+    loading: false,
+    exchange: true,
+    sign: false,
+    success: null,
+    time: 0,
+  },
 };
 const actions = {
   [constants.USER_ACTION]: ({ dispatch }, data) => {
-    const { action } = data;
+    const { action, market } = data;
 
     dispatch(constants.USER_ACTION_DIALOG, true);
 
@@ -42,10 +56,24 @@ const actions = {
       default:
         break;
     }
+
+    market.wsInstance.on('TokenFailure', (from, to, amount, event) => {
+      console.info(`Failure from ${from} Event: ${JSON.stringify(event)}`);
+      const { error, detail, info } = event.args;
+      console.log(`Error: ${error}, detail: ${detail}, info: ${info}`);
+      if (this.walletAddress === from) {
+        console.log('tx error');
+      }
+    });
   },
 
   [constants.USER_ACTION_DIALOG]: ({ commit }, data) => {
     commit(constants.USER_ACTION_DIALOG, data);
+  },
+
+  [constants.USER_ACTION_SWAP_DIALOG]: ({ commit }, info) => {
+    const { data } = info;
+    commit(constants.USER_ACTION_SWAP_DIALOG, data);
   },
 
   [constants.USER_ACTION_MINT]: async ({ commit, dispatch }, data) => {
@@ -383,6 +411,92 @@ const actions = {
         commit(constants.USER_ACTION_INFO_DIALOG, info);
       });
   },
+
+  [constants.USER_ACTION_SWAP]: async ({ commit, dispatch }, data) => {
+    let actionExchange = true;
+    const { state: { Session } } = store;
+    const sovrynSwap = new SovrynSwap(Session.chainId);
+    // const firestore = new Firestore();
+    // const comptroller = new Comptroller(Session.chainId);
+    let resp = '';
+    const info = {};
+
+    const {
+      sourceToken,
+      destToken,
+      amount,
+      minReturn,
+      amountToReceive,
+      conversionPath,
+      // select,
+      selectI,
+    } = data;
+
+    try {
+      info.sign = true;
+      info.wallet = true;
+      info.exchange = false;
+      commit(constants.USER_ACTION_SWAP, info);
+
+      if (sourceToken === addresses[Session.chainId].wRBTC) {
+        resp = await sovrynSwap
+          .convertFromRBTC(Session.account, conversionPath, amount, minReturn);
+      } else if (destToken === addresses[Session.chainId].wRBTC) {
+        resp = await sovrynSwap
+          .convertToRBTC(Session.account, conversionPath, amount, minReturn);
+        console.log('res', resp);
+      } else {
+        resp = await sovrynSwap
+          .convertByPath(Session.account, Session.walletAddress,
+            conversionPath, amount, minReturn);
+      }
+
+      info.wallet = false;
+      info.loading = true;
+      info.exchange = false;
+      info.symbol = selectI.underlyingSymbol;
+
+      commit(constants.USER_ACTION_SWAP, info);
+
+      sovrynSwap.wsSovrynSwapNetwork.on('Conversion', async () => {
+        if (actionExchange) {
+          actionExchange = false;
+
+          info.loading = false;
+          info.action = 'Exchange';
+          info.exchange = true;
+          info.amount = amountToReceive;
+          info.hash = resp.hash;
+
+          commit(constants.USER_ACTION_SWAP, info);
+
+          if (!state.swapDialog) {
+            dispatch(constants.USER_ACTION_NOTIFICATIONS, info);
+          }
+          // await firestore.saveUserAction(
+          //   comptroller.comptrollerAddress,
+          //   Session.walletAddress,
+          //   'Exchange',
+          //   amount,
+          //   select.underlyingSymbol,
+          //   amountToReceive,
+          //   selectI.underlyingSymbol,
+          //   new Date(),
+          //   resp.hash,
+          // );
+          setTimeout(() => {
+            dispatch(constants.MARKET_UPDATE_MARKET,
+              {
+                walletAddress: Session.walletAddress,
+                account: Session.account,
+              });
+          }, 2000);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 const mutations = {
@@ -400,6 +514,16 @@ const mutations = {
   // eslint-disable-next-line no-shadow
   [constants.USER_ACTION_DIALOG]: (state, payload) => {
     state.dialogLoading = payload;
+  },
+
+  // eslint-disable-next-line no-shadow
+  [constants.USER_ACTION_SWAP]: (state, payload) => {
+    state.swapInfo = { ...state.swapInfo, ...payload };
+  },
+
+  // eslint-disable-next-line no-shadow
+  [constants.USER_ACTION_SWAP_DIALOG]: (state, payload) => {
+    state.swapDialog = payload;
   },
 };
 

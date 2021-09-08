@@ -32,7 +32,7 @@
       "rule1": "You cannot deposit in this market, you have an active debt. Pay your debt and try again later.",
       "rule2": "You do not have enough funds",
       "rule3": "You do not have enough deposited",
-      "rule4": "This market is underfunded",
+      "rule4": "You have not deposited in this market",
       "rule5": "You cannot withdraw this amount, since your deposit is collateral for a debt",
       "rule6": "In order to deposit, you must first select return rate you want to obtain.",
       "rule7": "You cannot deposit more than 0.1 RBTC in this market"
@@ -261,7 +261,8 @@
     "description2": "You have withdrawn",
     "description3": "You borrowed",
     "description4": "You have paid",
-    "description5": "Go to RSK explorer"
+    "description5": "Go to RSK explorer",
+    "description6": "You have exchanged"
   },
   "menu": {
     "sidebar": {
@@ -351,6 +352,7 @@
     "description4": "Write the amount you are going to borrow",
     "description5": "By default, all your deposits are used as collateral to make a loan in any market.",
     "description6": "Liquidation risk",
+    "description7": "Current liquidation risk",
     "btn1": "Connect wallet",
     "btn2": "Borrow",
     "tooltip1": "This value is your maximum debt capacity for your collateral",
@@ -500,7 +502,8 @@
       "mint": "Deposit",
       "redeem": "Withdraw",
       "borrow": "Borrow",
-      "repayBorrow": "Pay"
+      "repayBorrow": "Pay",
+      "exchange": "Exchange"
     }
   },
   "swaps": {
@@ -515,7 +518,19 @@
     "btn1": "Exchange",
     "btn2": "Connect wallet",
     "tooltip1": "This is the equivalent value between the two selected currencies",
-    "tooltip2": "The value you will receive for the exchange can be up to 1% less than the initial amount of the transaction. Keep in mind that to benefit you, if the minimum exceeds the 1% limit, the transaction will be canceled."
+    "tooltip2": "The value you will receive for the exchange can be up to 1% less than the initial amount of the transaction. Keep in mind that to benefit you, if the minimum exceeds the 1% limit, the transaction will be canceled.",
+    "dialog": {
+      "description1": "Confirmation of the exchange",
+      "description2": "Amount to change",
+      "description3": "Amount to receive",
+      "description4": "Waiting for the confirmation in your wallet",
+      "description5": "Exchange summary",
+      "description6": "You have exchanged",
+      "description7": "Waiting for confirmation from the network",
+      "btn": "Confirm exchange",
+      "btn1": "Continue"
+
+    }
   },
   "feedback": {
     "chooseAChannel": {

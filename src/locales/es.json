@@ -32,7 +32,7 @@
       "rule1": "No puedes depositar en este mercado, tienes una deuda activa. Paga tu deuda e intenta más tarde.",
       "rule2": "No tienes fondos suficientes",
       "rule3": "No tienes suficiente depositado",
-      "rule4": "Este mercado no tiene fondos suficientes",
+      "rule4": "No has depositado en este marcado",
       "rule5": "No puedes retirar este monto, ya que tu deposito es colateral de una deuda",
       "rule6": "Para poder depositar, debes seleccionar primero la tasa de ganancia que quieres obtener.",
       "rule7": "No puedes depositar más de 0.1 RBTC en este mercado"
@@ -263,7 +263,8 @@
     "description2": "Has retirado",
     "description3": "Has pedido prestado",
     "description4": "Has pagado",
-    "description5": "Ver transacción en RSK explorer"
+    "description5": "Ver transacción en RSK explorer",
+    "description6": "Has intercambiado"
   },
   "menu": {
     "sidebar": {
@@ -354,6 +355,7 @@
     "description4": "Escribe la cantidad que vas a pedir prestada",
     "description5": "Por defecto, todos tus depósitos se utilizan como colateral para realizar un préstamo en cualquier mercado.",
     "description6": "Riesgo de liquidación",
+    "description7": "Riesgo de liquidación actual",
     "btn1": "Conectar billetera",
     "btn2": "Pedir prestado",
     "tooltip1": "Este valor es tu capacidad máxima de préstamo con respecto a tu colateral.",
@@ -503,7 +505,8 @@
       "mint": "Depósito",
       "redeem": "Retiro",
       "borrow": "Pedir prestado",
-      "repayBorrow": "Pagar"
+      "repayBorrow": "Pagar",
+      "exchange": "Intercambio"
     }
   },
   "swaps": {
@@ -514,11 +517,22 @@
     "description3": "Disponible:",
     "description4": "Precio",
     "description5": "Tarifa de proveedor de liquidez",
-    "description6": "Mínimo recibido",
+    "description6": "Minimo a recibir",
     "btn1": "Intercambiar",
     "btn2": "Conectar billetera",
     "tooltip1": "Este es el valor equivalente entre las dos monedas seleccionadas",
-    "tooltip2": "El valor que recibirás por el intercambio puede ser hasta 1% menor del monto inicial de la transacción. Ten en cuenta que para beneficiarte, si el minimo supera el límite del 1%, la transacción se cancelará. "
+    "tooltip2": "El valor que recibirás por el intercambio puede ser hasta 1% menor del monto inicial de la transacción. Ten en cuenta que para beneficiarte, si el minimo supera el límite del 1%, la transacción se cancelará. ",
+    "dialog": {
+      "description1": "Confirmación del intercambio",
+      "description2": "Monto a cambiar",
+      "description3": "Monto a recibir",
+      "description4": "Esperando la confirmación de la billetera",
+      "description5": "Resumen del intercambio",
+      "description6": "Has intercambiado",
+      "description7": "Esperando la confirmación de la red",
+      "btn": "Confirmar intercambio",
+      "btn1": "Continuar"
+    }
   },
   "feedback": {
     "chooseAChannel": {
