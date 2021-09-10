@@ -116,7 +116,7 @@ const actions = {
       info.firstTx = false;
       commit(constants.USER_ACTION_INFO_DIALOG, info);
     }
-    await market.supply(Session.account, amount)
+    market.supply(Session.account, amount)
       .then((tx) => {
         info.wallet = false;
         console.log('supply');
@@ -263,7 +263,7 @@ const actions = {
         commit(constants.USER_ACTION_INFO_DIALOG, info);
         market.wsInstance.on('Borrow', async (from, borrowAmount) => {
           if (from.toLowerCase() === Session.walletAddress
-          && Number(amount) === borrowAmount / 1e18) {
+            && Number(amount) === borrowAmount / 1e18) {
             info.loading = false;
             info.borrow = true;
             info.amount = borrowAmount / 1e18;
@@ -407,10 +407,10 @@ const actions = {
         info.success = true;
         commit(constants.USER_ACTION_INFO_DIALOG, info);
       }).catch(() => {
-        info.loading = false;
-        info.success = false;
-        commit(constants.USER_ACTION_INFO_DIALOG, info);
-      });
+      info.loading = false;
+      info.success = false;
+      commit(constants.USER_ACTION_INFO_DIALOG, info);
+    });
   },
 
   [constants.USER_ACTION_SWAP]: async ({ commit, dispatch }, data) => {

@@ -168,7 +168,7 @@ export default class Market {
   async getSubsidyFound(isRbtc = false) {
     return isRbtc
       ? Number(this.instance.callStatic.subsidyFund
-        ? await this.instance.callStatic.subsidyFund() : 0) / factor : 0;
+      ? await this.instance.callStatic.subsidyFund() : 0) / factor : 0;
   }
 
   async getInitialSupply(address) {
@@ -285,21 +285,29 @@ export default class Market {
       StandardTokenAbi,
       Vue.web3,
     );
-    let resp;
-    try {
-      const x = await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
-      console.log('approve', x);
-    } catch (error) {
-      console.error('approve error', error);
-    }
-    try {
-      resp = await this.instance.connect(accountSigner)
+    const underlyingAssetWs = new ethers.Contract(
+      await this.underlying(),
+      StandardTokenAbi,
+      Vue.web3Ws,
+    );
+    const x = await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
+    console.log('approve', x);
+    let mintResponse;
+    underlyingAssetWs.on('Approval', async (owner, spender, val) => {
+      console.log(`Owner: ${owner}`);
+      console.log(`Spender: ${spender}`);
+      console.log(`Value: ${Number(val) / 1e18}`);
+      mintResponse = await this.instance.connect(accountSigner)
         .mint(value, { gasLimit: this.gasLimit });
-      console.log('response', resp);
-    } catch (error) {
-      console.error('Mint error', error);
-    }
-    return resp;
+    });
+    this.wsInstance.on('Mint', (minter, mintAmount, mintTokens) => {
+      console.log('=== Approve & Mint ===');
+      console.log(`Minter: ${minter}`);
+      console.log(`Mint Amount: ${Number(mintAmount) / 1e18}`);
+      console.log(`Mint Tokens: ${Number(mintTokens) / 1e18}`);
+      console.log('=== Approve & Mint ===');
+    });
+    return mintResponse;
   }
 
   async borrow(account, amountIntended) {
