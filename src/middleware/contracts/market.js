@@ -285,8 +285,21 @@ export default class Market {
       StandardTokenAbi,
       Vue.web3,
     );
-    await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
-    return this.instance.connect(accountSigner).mint(value, { gasLimit: this.gasLimit });
+    let resp;
+    try {
+      const x = await underlyingAsset.connect(accountSigner).approve(this.marketAddress, value);
+      console.log('approve', x);
+    } catch (error) {
+      console.error('approve error', error);
+    }
+    try {
+      resp = await this.instance.connect(accountSigner)
+        .mint(value, { gasLimit: this.gasLimit });
+      console.log('response', resp);
+    } catch (error) {
+      console.error('Mint error', error);
+    }
+    return resp;
   }
 
   async borrow(account, amountIntended) {
@@ -302,16 +315,12 @@ export default class Market {
   }
 
   async repay(account, amountIntended, walletAddress) {
-    console.log('amountIntended', amountIntended);
-    console.log('account', account);
     const accountSigner = signer(account);
     let value = 0;
     if (await Market.isCRbtc(this.marketAddress) || await Market.isCSat(this.marketAddress)) {
       const borrowBalanceCurrent = await this.borrowBalanceCurrent(walletAddress);
-      console.log('borrowBalanceCurrent', borrowBalanceCurrent);
       value = amountIntended === -1 ? Market.getAmountDecimals(borrowBalanceCurrent)
         : Market.getAmountDecimals(amountIntended);
-      console.log(value);
       return this.instance.connect(accountSigner).repayBorrow({ value, gasLimit: this.gasLimit });
     }
     value = amountIntended === -1 ? '115792089237316195423570985008687907853269984665640564039457584007913129639935'

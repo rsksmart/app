@@ -109,7 +109,7 @@
               <v-text-field
                 type="number"
                 v-model="amount"
-                :rules="[rules.leverage, rules.minBalance, rules.collateral, rules.minkRBTC,
+                :rules="[rules.leverage, rules.minBalance, rules.collateral, rules.minkSAT,
                 rules.withoutBalance, rules.supplyBalance, rules.typeMarket]"
                 class="h1-title text-info pa-0 ma-0"
                 background-color="#CFE7DA"
@@ -294,7 +294,7 @@ export default {
           && this.account && this.isCRBTC))
           ? this.typeMarket !== '' : true)
           || this.$t('dialog.supply-redeem.rule6'),
-        minkRBTC: () => (this.marketAddress === addresses[this.chainId].kSAT && this.typeMarket !== ''
+        minkSAT: () => (this.marketAddress === addresses[this.chainId].kSAT && this.typeMarket !== ''
           ? (Number(this.info.supplyBalance) + Number(this.amount)) <= 0.1 : true)
           || this.$t('dialog.supply-redeem.rule7'),
       },
@@ -351,7 +351,7 @@ export default {
     },
     activeButton() {
       return this.amount > 0 && typeof this
-        .rules.minkRBTC() !== 'string' && typeof this
+        .rules.minkSAT() !== 'string' && typeof this
         .rules.typeMarket() !== 'string' && typeof this
         .rules.minBalance() !== 'string' && typeof this
         .rules.withoutBalance() !== 'string' && typeof this

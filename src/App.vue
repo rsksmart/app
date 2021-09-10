@@ -1,5 +1,11 @@
 <template>
   <v-app class="app secondary-color">
+    <!-- <v-progress-linear
+      class="progress-bar"
+      color="#EEAF0E"
+      rounded
+      value="100"
+    ></v-progress-linear> -->
     <div class="d-flex">
       <left-bar :drawer="drawer"/>
       <div class="container-app secondary-color">
@@ -114,10 +120,10 @@ export default {
     this.whitelist = new Whitelist(this.chainId);
     this.loadMarkets();
     this.activeWhitelist();
-    const walletconnect = localStorage.getItem('walletconnect');
-    if (walletconnect) {
-      localStorage.removeItem('walletconnect');
-    }
+    // const walletconnect = localStorage.getItem('walletconnect');
+    // if (walletconnect) {
+    //   localStorage.removeItem('walletconnect');
+    // }
   },
   mounted() {
     if (localStorage.flag) {

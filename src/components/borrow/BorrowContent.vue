@@ -90,16 +90,13 @@
       </div>
 
       <div class="content-action">
-        <div class="mt-1">
-
-        <div class="p1-descriptions">{{$t('borrow.description7')}}</div>
-        <div class="line-risk">
-          <div class="actual-risk" :style="{ width: percent + '%'}"></div>
+        <div v-if="tabMenu" class="mt-1">
+          <div class="p1-descriptions">{{$t('borrow.description7')}}</div>
+          <div class="line-risk">
+            <div class="actual-risk" :style="{ width: percent + '%'}"></div>
+          </div>
+          <div class="p6-reading-values text-uppercase">{{riskDescription}}</div>
         </div>
-        <div class="p6-reading-values text-uppercase">{{riskDescription}}</div>
-        </div>
-
-        <!-- <v-divider class="divider mb-4 mt-6"></v-divider> -->
 
         <div class="p1-descriptions mb-3 text-info mt-6">
           {{ tabMenu ? $t('borrow.description4') : $t('pay.description2')}}
@@ -362,6 +359,7 @@ export default {
     },
     infoStore() {
       this.info = this.infoStore;
+      this.getDataRisk();
     },
     selectStore() {
       this.select = this.selectStore;
@@ -376,7 +374,12 @@ export default {
       this.market = this.marketStore;
     },
     account() {
-      if (!this.account) this.tabMenu = true;
+      if (!this.account) {
+        this.tabMenu = true;
+        this.percent = 0;
+        this.percentCurrent = 0;
+        this.reset();
+      }
       this.updateMarket();
       this.totalDepositsInUSD();
       this.getDataRisk();
@@ -539,7 +542,10 @@ export default {
       }
     },
     calculateRisk() {
+      console.log('info', this.info);
       this.borrowCurrent = (this.canBorrow - this.liquidity) + this.borrowValueInUSD;
+      console.log('this.borrowCurrent', (this.canBorrow - this.liquidity) + this.borrowValueInUSD);
+      console.log('borrowValueInUSD', this.borrowValueInUSD);
       const percent = ((this.borrowCurrent / this.canBorrow) * 100).toFixed(0);
       this.percentCurrent = Number(percent);
     },
@@ -563,7 +569,6 @@ export default {
     this.getMarket();
     this.getMarketsStore(this.markets);
     this.totalDepositsInUSD();
-    this.getDataRisk();
   },
 };
 </script>

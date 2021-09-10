@@ -14,7 +14,10 @@ const state = {
   drawer: true,
   showDialogConnect: false,
   typeConnection: '',
+  sessionWalletConnect: '',
 };
+
+const windowEthereum = window.ethereum || window.eth;
 
 if (window.ethereum) {
   window.ethereum.on('accountsChanged', () => {
@@ -28,11 +31,12 @@ if (window.ethereum) {
 const actions = {
   [constants.SESSION_CONNECT_WEB3]: async ({ commit, dispatch }, wallet) => {
     let provider = null;
-    if (window.ethereum) {
-      provider = window.ethereum;
-      if (wallet === constants.WALLET_LIQUALITY && window.ethereum.isLiquality) {
+    if (windowEthereum) {
+      provider = windowEthereum;
+      if (wallet === constants.WALLET_LIQUALITY && window.eth.isLiquality) {
         provider = window.rsk;
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        await window.eth.request({ method: 'eth_requestAccounts' });
+        await provider.enable();
       } else if (wallet === constants.WALLET_NIFTY && window.ethereum.isNiftyWallet) {
         window.ethereum.request({ method: 'eth_requestAccounts' });
       } else if (wallet === constants.WALLET_METAMASK && window.ethereum.isMetaMask) {
@@ -74,7 +78,15 @@ const actions = {
       // eslint-disable-next-line no-multi-assign
       Vue.prototype.$web3 = Vue.web3 = new ethers.providers.Web3Provider(provider);
       const account = await Vue.web3.getSigner();
+      console.log('account', account);
+      console.log('windowEthereum', windowEthereum);
+
       const walletAddress = await account.getAddress();
+      // walletAddress = walletAddress.toLowerCase();
+
+      // const walletAddress = walletLiquality || await account.getAddress();
+      console.log('walletAddress', walletAddress);
+
       // console.log('wallet', account, walletAddress);
       commit(constants.SESSION_SET_PROPERTY, { provider });
       commit(constants.SESSION_SET_PROPERTY, { account });
@@ -88,10 +100,12 @@ const actions = {
       commit(constants.SESSION_SET_PROPERTY, { chainId: state.provider.chainId });
       return;
     }
-    if (window.ethereum) {
-      const chainId = window?.ethereum?.chainId ?? 31;
-      if (window.ethereum.isLiquality) {
-        commit(constants.SESSION_SET_PROPERTY, { chainId: parseInt(chainId, 16) });
+    if (windowEthereum) {
+      const chainId = windowEthereum?.chainId ?? 31;
+      if (windowEthereum.isLiquality) {
+        console.log('chainId', chainId);
+        console.log('parseInt(chainId, 16)', parseInt(chainId, 16));
+        commit(constants.SESSION_SET_PROPERTY, { chainId: 31 });
         return;
       }
       if (window.ethereum.isNiftyWallet) {

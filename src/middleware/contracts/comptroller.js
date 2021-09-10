@@ -4,6 +4,8 @@ import Vue from 'vue';
 import { addresses } from './constants';
 import signer from './utils';
 
+ethers.utils.Logger.setLogLevel(ethers.utils.Logger.levels.ERROR);
+
 export default class Comptroller {
   constructor(chainId) {
     this.deployBlock = addresses[chainId].deployBlock;

@@ -116,13 +116,14 @@ const actions = {
       info.firstTx = false;
       commit(constants.USER_ACTION_INFO_DIALOG, info);
     }
-
     await market.supply(Session.account, amount)
       .then((tx) => {
         info.wallet = false;
+        console.log('supply');
         commit(constants.USER_ACTION_INFO_DIALOG, info);
         market.wsInstance.on('Mint', async (from, actualMintAmount) => {
-          // console.log('mint');
+          console.log('from', from);
+          console.log('Session.walletAddress', Session.walletAddress);
           if (from === Session.walletAddress && Number(amount) === actualMintAmount / 1e18) {
             // console.log('cantidad depositada', actualMintAmount / 1e18);
             info.loading = false;
@@ -189,11 +190,10 @@ const actions = {
 
     await market.redeem(Session.account, amount)
       .then((tx) => {
-        // console.log(tx);
         info.wallet = false;
         commit(constants.USER_ACTION_INFO_DIALOG, info);
         market.wsInstance.on('Redeem', async (from, redeemAmount) => {
-          if (from === Session.walletAddress) {
+          if (from.toLowerCase() === Session.walletAddress) {
             info.loading = false;
             info.deposit = false;
             info.amount = redeemAmount / 1e18;
@@ -262,7 +262,8 @@ const actions = {
         info.wallet = false;
         commit(constants.USER_ACTION_INFO_DIALOG, info);
         market.wsInstance.on('Borrow', async (from, borrowAmount) => {
-          if (from === Session.walletAddress && Number(amount) === borrowAmount / 1e18) {
+          if (from.toLowerCase() === Session.walletAddress
+          && Number(amount) === borrowAmount / 1e18) {
             info.loading = false;
             info.borrow = true;
             info.amount = borrowAmount / 1e18;
@@ -333,7 +334,7 @@ const actions = {
         info.wallet = false;
         commit(constants.USER_ACTION_INFO_DIALOG, info);
         market.wsInstance.on('RepayBorrow', async (from, _, borrowAmount) => {
-          if (from === Session.walletAddress) {
+          if (from.toLowerCase() === Session.walletAddress) {
             info.loading = false;
             info.borrow = false;
             info.amount = borrowAmount / 1e18;
